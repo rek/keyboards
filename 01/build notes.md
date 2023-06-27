@@ -4,13 +4,19 @@ Style: dactyl manuform 5x6
 
 (but its really: 4x6 + 4 + 3)
 
+## Model notes:
+
+I got the base plates from back here: https://github.com/joshreve/dactyl-keyboard/tree/75da53f96e389d837055921bd2eb61b58b7787e2
+
+Note that they seem to be broken in all commits past this one (as on writing, main is [here](https://github.com/joshreve/dactyl-keyboard/commit/dd706f14f9aacfc429160bf5b03b688fdb5ce2f4))
+
 ## Build notes:
 
-used normal amoebas and they were ok, made it pretty quick to solder.
+Used normal amoebas and they were ok, made it pretty quick to solder. Would use again.
 
-diode: 1N4148
+Diode to use: 1N4148
 
-## Firmware:
+## Firmware notes:
 ```
 python3 -m pip install --user qmk
 qmk setup
