@@ -4,6 +4,8 @@
 
 (but it is really: 4x6 + 4 + 3) 62 Keys!
 
+Controller: Arduino Pro Micro
+
 ## Model notes:
 
 I got the base plates from back here: https://github.com/joshreve/dactyl-keyboard/tree/75da53f96e389d837055921bd2eb61b58b7787e2
@@ -29,6 +31,11 @@ Then edit the keymap here:
 ```
 
 flash: `qmk flash`
+
+or to force it, if you don't set it as default:
+```
+qmk flash -kb handwired/dactyl_manuform/5x6_62 -km default
+```
 
 then just read: https://docs.qmk.fm/#/newbs_building_firmware
 
