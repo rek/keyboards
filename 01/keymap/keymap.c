@@ -26,15 +26,15 @@
             _______   , _______  , _______   , _______   , KC_LT     , KC_GT     ,                    KC_LCBR      , KC_RCBR     , _______      , _______      , _______ , KC_PLUS,
             QK_BOOT   , C(KC_W)  , _______   , _______   , C(KC_R)   , C(KC_T)   ,                    _______      , _______     , C(S(KC_UP))  , C(S(KC_DOWN)), KC_TILD , KC_PIPE,
             A(KC_TAB) , C(KC_A)  , C(KC_S)   , C(S(KC_D)), C(KC_Z)   , C(KC_R)   ,                    _______      , KC_LEFT     , KC_UP        , KC_DOWN      , KC_RGHT , KC_EQL,
-            _______   , C(KC_Z)  , C(KC_X)   , C(KC_C)   , C(KC_V)   , C(S(KC_D)),                    _______      , _______     , G(S(KC_PGUP)), G(S(KC_PGDN)), KC_BSLS , KC_EQL,
-            _______   , _______  , _______   , C(KC_SLSH),                                            KC_TILD      , _______     , KC_LBRC      , KC_RBRC      ,
+            C(KC_D)   , C(KC_Z)  , C(KC_X)   , C(KC_C)   , C(KC_V)   , A(KC_D)   ,                    _______      , _______     , G(S(KC_PGUP)), G(S(KC_PGDN)), KC_BSLS , KC_EQL,
+            C(S(KC_S)), _______  , _______   , C(KC_SLSH),                                            KC_TILD      , _______     , KC_LBRC      , KC_RBRC      ,
                                                _______   , KC_LGUI   , A(KC_PSCR),                    C(S(KC_LEFT)), KC_GRAVE    , C(S(KC_RIGHT))
 
         ),
 
         [_RAISE] = LAYOUT(
             KC_F12    , KC_F1    , KC_F2     , KC_F3     , KC_F4     , KC_F5     ,                    KC_F6  , KC_F7   , KC_F8   , KC_F9   , KC_F10  , KC_F11 ,
-            _______   , _______  , _______   , _______   , _______   , C(KC_F12) ,                    _______, _______ , _______ , _______ , _______ , _______,
+            KC_LCBR   , KC_RCBR  , KC_LT     , KC_GT     , KC_LBRC   , KC_RBRC   ,                    _______, _______ , _______ , _______ , _______ , _______,
             _______   , KC_LPRN  , KC_RPRN   , KC_EQL    , KC_GT     , KC_LCBR   ,                    _______, KC_HOME , KC_PGUP , KC_PGDN , KC_END  , _______,
             _______   , _______  , _______   , _______   , _______   , _______   ,                    KC_TAB , _______ , _______ , _______ , _______ , _______,
             _______   , _______  , _______   , _______   ,                                            _______, _______ , _______ , LALT(KC_TAB),

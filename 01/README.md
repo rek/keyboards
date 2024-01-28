@@ -29,6 +29,7 @@ Then edit the keymap here:
 ```
 ~/qmk_firmware/keyboards/handwired/dactyl_manuform/5x6/keymaps/rek
 ```
+(or if you store the newist copy in dev/keyboards, make sure to copy that into the above folder, as currently i don't know a way to get it to flash from a custom path)
 
 flash: `qmk flash`
 
