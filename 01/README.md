@@ -1,4 +1,4 @@
-# Keyboard
+# Keyboard 1
 
 **Style**: dactyl manuform 5x6
 
@@ -44,8 +44,14 @@ To reset for flashing we have 3 options:
 * **Bootmagic reset**: Hold down the key at (0,0) in the matrix (usually the top left key or Escape) and plug in the keyboard
 * **Physical reset button**: Briefly press the button on the back of the PCB - some may have pads you must short instead
 * **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
+* 
 ## Next time:
 
 Reaearch: Amoeba Royale **vs** Amoeba King
 
 Purchase: [PCS Kailh Hot-swappable PCB Socket Sip Socket Hot Plug](https://www.amazon.com/gp/product/B096WZ6TJ5?ie=UTF8&psc=1&linkCode=ll1&tag=dlfordio-20&linkId=1c74b975a667dbd57728eb68931f6446&language=en_US&ref_=as_li_ss_tl)
+
+
+## Notes after usage
+
+- The amoebas drifted in distance from the switches during soldering, causing the joins to wear over time and require constant touchups. Could be avoided with more precision and pressing the two together during soldering, but also might just be easier to not use them unless you are going to be adding LED's.
