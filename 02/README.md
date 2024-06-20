@@ -8,6 +8,11 @@ Controller:
  - Arduino Nano - 15 pins
 
 Switches: 
- - Kailh Choc Low Profile 1350
+ - Kailh Choc Low Profile 1350 (v1)
    - Crystal Red
- - 
+   - Dimensions: 
+
+## KiCad
+
+Arduino nano model from:
+ - https://github.com/g200kg/kicad-lib-arduino
