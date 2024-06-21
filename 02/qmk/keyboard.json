@@ -9,8 +9,8 @@
         "device_version": "0.0.1"
     },
     "matrix_pins": {
-        "cols": ["D2", "C1", "C2", "C3", "C4", "C5"],
-        "rows": ["D3", "D3", "D4", "D5"]
+        "cols": ["D6", "D7", "B0", "B1", "B2", "B3"],
+        "rows": ["D2", "D3", "D4", "D5"]
     },
     "diode_direction": "COL2ROW",
     "processor": "atmega328p",
