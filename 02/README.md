@@ -1,4 +1,4 @@
-# Keyboard 2
+# Keyboard 2 - aximi
 
 Inspired by: https://github.com/sadekbaroudi/fingerpunch/tree/master/keyboards/ximi/v1
 
@@ -47,6 +47,8 @@ Then you just need to set the 'CS' pin in the config, as that can go anywhere.
 
 ## Firmware
 
+When choosing pins, make sure to pick the ATMega pins definitions from the Pinout
+
 Test your config:
 
 ```sh
@@ -75,7 +77,7 @@ avrdude -p atmega328p -c arduino -U flash:w:handwired_aximi_default.hex:i -P /de
 
 If you have a 328PB without a bootloader (aka: a cheap clone)
 
-Then use the USPISP
+Then you need to use USBISP to flash a bootloader onto the MCU
 
 ## KiCad
 
