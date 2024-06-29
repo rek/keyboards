@@ -6,15 +6,13 @@ Inspired by: https://github.com/sadekbaroudi/fingerpunch/tree/master/keyboards/x
 
 ### Controller:
 
-- Arduino Nano - 15 pins
-  - Atmel MEGA 328PB - U
-  - Which is: atmega328p
+- Pro Micro - 12 pins
 
-### Switches: 
- - Kailh Choc Low Profile 1350 (v1)
-   - Crystal Red
-   - Dimensions: 
+### Switches:
 
+- Kailh Choc Low Profile 1350 (v1)
+  - Crystal Red
+  - Dimensions:
 
 ### Trackball:
 
@@ -45,41 +43,29 @@ CS is good on D9 Perhaps
 
 Then you just need to set the 'CS' pin in the config, as that can go anywhere.
 
-## Firmware
+# TRRS
 
-When choosing pins, make sure to pick the ATMega pins definitions from the Pinout
+One data pin: B4
+The other two VCC and GND
+
+Which ones don't matter, just keep them the same.
+
+## Firmware
 
 Test your config:
 
 ```sh
-qmk compile -kb handwired/aximi -km default
+qmk compile -kb handwired/aximi -km vial
 ```
 
-Then flash it:
+Then flash it: (from vial folder)
 
 ```sh
-qmk flash -kb handwired/aximi -km default
+qmk flash -kb handwired/aximi -km vial
 ```
-
-To flash onto Arduino UNO:
-
-```sh
-avrdude -p atmega328p -c arduino -U flash:w:handwired_aximi_default.hex:i -P /dev/ttyACM0
-```
-
-To flash onto Nano:
-
-```sh
-avrdude -p atmega328p -c arduino -U flash:w:handwired_aximi_default.hex:i -P /dev/ttyUSB0
-```
-
-## Flash bootloader
-
-If you have a 328PB without a bootloader (aka: a cheap clone)
-
-Then you need to use USBISP to flash a bootloader onto the MCU
 
 ## KiCad
 
 Arduino nano model from:
- - https://github.com/g200kg/kicad-lib-arduino
+
+- https://github.com/g200kg/kicad-lib-arduino
