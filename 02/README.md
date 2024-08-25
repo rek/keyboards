@@ -64,6 +64,16 @@ Then flash it: (from vial folder)
 qmk flash -kb handwired/aximi -km vial
 ```
 
+### Notes on QMK + Vial
+
+The martix elements in the layout must be in the right order.
+
+It goes from the top row all along both sides off the keyboard. Then to the second row etc.
+
+https://docs.qmk.fm/features/split_keyboard#layout-macro
+
+These must also be added in order in the layout array in `info.json`
+
 ## KiCad
 
 Arduino nano model from:
