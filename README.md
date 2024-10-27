@@ -29,4 +29,4 @@ Then don't forget: https://docs.qmk.fm/faq_build#linux-udev-rules
 - Cannot find the device?
   - Make sure you are using a data USB cable
   - Try USB-A not USB-C
-    - For exaple Arduino Nano will not show up using a C-C cable
+    - For example Arduino Nano will not show up using a C-C cable
