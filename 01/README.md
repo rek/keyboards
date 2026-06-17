@@ -46,7 +46,7 @@ To reset for flashing we have 3 options:
 
 ## Next time:
 
-Reaearch: Amoeba Royale **vs** Amoeba King
+Research: Amoeba Royale **vs** Amoeba King
 
 Purchase: [PCS Kailh Hot-swappable PCB Socket Sip Socket Hot Plug](https://www.amazon.com/gp/product/B096WZ6TJ5?ie=UTF8&psc=1&linkCode=ll1&tag=dlfordio-20&linkId=1c74b975a667dbd57728eb68931f6446&language=en_US&ref_=as_li_ss_tl)
 
