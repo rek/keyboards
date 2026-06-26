@@ -9,7 +9,12 @@
 #define SPLIT_USB_DETECT
 
 #define MATRIX_ROW_PINS { D4, C6, D7, E6 }
+// Left half: reversed because the Pro Micro is installed backwards.
 #define MATRIX_COL_PINS { B3, B1, F7, F6, F5, F4 }
+// Right half: the board is a second left PCB used flipped (B.Cu up, hotswap accessible).
+// The board flip reverses columns, and the backwards MCU also reverses columns —
+// two reversals cancel out, so the right half needs the original pin order.
+#define MATRIX_COL_PINS_RIGHT { F4, F5, F6, F7, B1, B3 }
 
 #define DIODE_DIRECTION COL2ROW
 

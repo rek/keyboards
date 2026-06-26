@@ -19,7 +19,9 @@ serial wire (TRRS). Runs **Vial**.
 | `keymaps/vial/` | The real keymap: `keymap.c`, `config.h` (Vial UID), `rules.mk`, `vial.json` |
 
 ### Hardware (from build notes)
-- Rows: `D4, C6, D7, E6` · Cols: `B3, B1, F7, F6, F5, F4` · diode `COL2ROW`
+- Rows: `D4, C6, D7, E6` · diode `COL2ROW`
+- Cols (left): `B3, B1, F7, F6, F5, F4` — reversed; Pro Micro is installed backwards
+- Cols (right): `F4, F5, F6, F7, B1, B3` — original order; board flip + backwards MCU cancel out
 - Split serial data pin: `D1` (the single TRRS data line; other two pins are VCC/GND)
 - Handedness: **`EE_HANDS`** — each half stores L/R in EEPROM, written at flash time
   (see flashing below). With `SPLIT_USB_DETECT` either half can be the USB host.
