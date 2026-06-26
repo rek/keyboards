@@ -1,81 +1,78 @@
-# Keyboard 2 - aximi
+# Keyboard 02 — aximi
 
 Inspired by: https://github.com/sadekbaroudi/fingerpunch/tree/master/keyboards/ximi/v1
 
-## Hardware notes
+Split 42-key Kailh Choc V1 keyboard. Two Pro Micro (atmega32u4) halves over TRRS serial.
 
-### Controller:
+---
 
-- Pro Micro - 12 pins
+## PCB history
 
-### Switches:
+### PCB v1 (`pcb/`)
 
-- Kailh Choc Low Profile 1350 (v1)
-  - Crystal Red
-  - Dimensions:
+Original single-sided design. Worked well as a left half. No dedicated right PCB.
 
-### Trackball:
+### PCB v2 (`pcb-left-v1/`, `pcb-right-v1/`)
 
-- Sensor: PMW3360
+Intended to be a proper left + right pair. Due to a mirroring error in KiCad the
+"right" PCB was generated with all components on the wrong copper layers, making it
+effectively a second left. This version went into production — **many copies exist**.
 
-SPI Communications
-GD (GND) -- Connects to any GND on the controller.
-VI (V In) -- Power connects to a power supply pin on the controller.
-MI (MISO) -- The SPI "Master In Slave Out" pin.
-MO (MOSI) -- The SPI "Master Out Slave In" pin.
-SC (SCLK) -- The serial clock pin to sync data.
-SS (Slave Select or Chip Select - CS) -- The pin the controller uses to notify the sensor that it wants to talk.
+The `pcb-right-v1/` files in this repo have since been corrected (F.Cu ↔ B.Cu layer
+swap so hotswap sockets sit on F.Cu and the Pro Micro/TRRS/diodes on B.Cu), but the
+boards already ordered match the original two-lefts layout.
 
-On a Pro Micro the SPI pins are:
+### PCB v3 (next production run)
 
-SCLK - 15
-MISO - 16
-MOSI - 17
+Uses the corrected `pcb-right-v1/` files. True left + right pair, assembles without
+any firmware workarounds.
 
-On a Arduino Nano clone the SPI pins are:
+---
 
-SS - D10
-MOSI - D11
-MISO - D12
-SCLK - D13
+## Firmware history
 
-CS is good on D9 Perhaps
+### `qmk-v2/` — for PCB v2 (two-lefts production boards)
 
-Then you just need to set the 'CS' pin in the config, as that can go anywhere.
+Because the physical "right" PCB is a left PCB used upside-down, the column pins read
+in reverse order on that half. `MATRIX_COL_PINS` is set to `{ B3, B1, F7, F6, F5, F4 }`
+(reversed) to compensate. **Keep this config** — it's the correct firmware for all
+existing v2 boards.
 
-# TRRS
-
-One data pin: B4
-The other two VCC and GND
-
-Which ones don't matter, just keep them the same.
-
-## Firmware
-
-Test your config:
-
+Flash the left half:
 ```sh
-qmk compile -kb handwired/aximi -km vial
+cd ~/dev/forks/vial-qmk
+QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-left
 ```
 
-Then flash it: (from vial folder)
-
+Flash the right half (which is physically a second left):
 ```sh
-qmk flash -kb handwired/aximi -km vial
+QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-right
 ```
 
-### Notes on QMK + Vial
+### `qmk-v3/` — for PCB v3 (corrected boards, not yet printed)
 
-The martix elements in the layout must be in the right order.
+Target firmware for the v3 production run. Should not need the column-reversal
+workaround since the PCB is properly mirrored. Verify by testing the right half
+once assembled before finalising the keymap.
 
-It goes from the top row all along both sides off the keyboard. Then to the second row etc.
+---
 
-https://docs.qmk.fm/features/split_keyboard#layout-macro
+## Hardware
 
-These must also be added in order in the layout array in `info.json`
+### Controller
+- Pro Micro (atmega32u4, caterina bootloader)
+
+### Switches
+- Kailh Choc Low Profile 1350 (v1) — Crystal Red
+
+### Split link
+- TRRS — single serial data wire (`D1`), other two pins VCC/GND
+
+### Trackball (future)
+- PMW3360 sensor via SPI — not yet implemented
+
+---
 
 ## KiCad
 
-Arduino nano model from:
-
-- https://github.com/g200kg/kicad-lib-arduino
+Arduino nano footprint from: https://github.com/g200kg/kicad-lib-arduino
