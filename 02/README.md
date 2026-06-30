@@ -27,6 +27,15 @@ boards already ordered match the original two-lefts layout.
 Uses the corrected `pcb-right-v1/` files. True left + right pair, assembles without
 any firmware workarounds.
 
+### PCB v4 (`pcb-v4/`) — in progress
+
+Based on the v3 left half. Key change: switching to a reversible Kailh Choc V1 hotswap
+footprint (`Kailh_socket_PG1350_reversible`) so the hotswap socket can be soldered on
+either side of the board, making a single PCB usable as either left or right half.
+
+**Status:** footprint swap not yet done — needs to be completed in KiCad (Change
+Footprint on all 21 switches, re-route, then export Gerbers).
+
 ---
 
 ## Firmware history
