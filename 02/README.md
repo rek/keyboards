@@ -33,8 +33,13 @@ Based on the v3 left half. Key change: switching to a reversible Kailh Choc V1 h
 footprint (`Kailh_socket_PG1350_reversible`) so the hotswap socket can be soldered on
 either side of the board, making a single PCB usable as either left or right half.
 
-**Status:** footprint swap not yet done — needs to be completed in KiCad (Change
-Footprint on all 21 switches, re-route, then export Gerbers).
+**Status:** all 21 switch footprints swapped to `Library:Kailh_socket_PG1350_reversible`
+(pads 1 & 2 on both F.Cu and B.Cu). Existing traces will show DRC errors at old pad
+positions — open in KiCad, re-route the switch connections, then export Gerbers.
+
+**Next step:** also swap MCU (Pro Micro) and TRRS footprints to reversible variants
+(same approach as Lily58), so one PCB truly serves as either half with no orientation
+constraint.
 
 ---
 
