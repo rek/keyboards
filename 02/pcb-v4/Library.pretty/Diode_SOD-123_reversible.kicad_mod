@@ -1,0 +1,61 @@
+(module Diode_SOD-123_reversible (layer F.Cu) (tedit 00000001)
+  (descr "SOD-123 reversible — pads on F.Cu and B.Cu for single-PCB reversible design")
+  (tags "SOD-123 diode reversible")
+  (attr smd)
+  (fp_text reference REF** (at 0 2) (layer F.SilkS) hide
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (fp_text value Diode (at 0 -2.1) (layer F.Fab) hide
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (fp_text user "${REFERENCE}" (at 0 2) (layer F.Fab) hide
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (fp_text user "${REFERENCE}" (at 0 2) (layer B.Fab) hide
+    (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
+  )
+
+  ; Front silk — cathode bar on LEFT (pad 1 / K side at x=-1.65)
+  (fp_line (start -0.35 -0.55) (end -0.35 0) (layer F.SilkS) (width 0.15))
+  (fp_line (start -0.35 0.55) (end -0.35 0) (layer F.SilkS) (width 0.15))
+  (fp_line (start -0.35 0) (end -0.75 0) (layer F.SilkS) (width 0.15))
+  (fp_line (start -0.35 0) (end 0.25 -0.4) (layer F.SilkS) (width 0.15))
+  (fp_line (start 0.25 0.4) (end -0.35 0) (layer F.SilkS) (width 0.15))
+  (fp_line (start 0.25 -0.4) (end 0.25 0.4) (layer F.SilkS) (width 0.15))
+  (fp_line (start 0.75 0) (end 0.25 0) (layer F.SilkS) (width 0.15))
+
+  ; Back silk — cathode bar on RIGHT (mirror of front; when board flipped K is on same physical side)
+  (fp_line (start 0.35 -0.55) (end 0.35 0) (layer B.SilkS) (width 0.15))
+  (fp_line (start 0.35 0.55) (end 0.35 0) (layer B.SilkS) (width 0.15))
+  (fp_line (start 0.35 0) (end 0.75 0) (layer B.SilkS) (width 0.15))
+  (fp_line (start 0.35 0) (end -0.25 -0.4) (layer B.SilkS) (width 0.15))
+  (fp_line (start -0.25 0.4) (end 0.35 0) (layer B.SilkS) (width 0.15))
+  (fp_line (start -0.25 -0.4) (end -0.25 0.4) (layer B.SilkS) (width 0.15))
+  (fp_line (start -0.75 0) (end -0.25 0) (layer B.SilkS) (width 0.15))
+
+  ; Courtyards — both sides
+  (fp_line (start -2.35 -1.15) (end 2.35 -1.15) (layer F.CrtYd) (width 0.05))
+  (fp_line (start 2.35 -1.15) (end 2.35 1.15) (layer F.CrtYd) (width 0.05))
+  (fp_line (start 2.35 1.15) (end -2.35 1.15) (layer F.CrtYd) (width 0.05))
+  (fp_line (start -2.35 1.15) (end -2.35 -1.15) (layer F.CrtYd) (width 0.05))
+  (fp_line (start -2.35 -1.15) (end 2.35 -1.15) (layer B.CrtYd) (width 0.05))
+  (fp_line (start 2.35 -1.15) (end 2.35 1.15) (layer B.CrtYd) (width 0.05))
+  (fp_line (start 2.35 1.15) (end -2.35 1.15) (layer B.CrtYd) (width 0.05))
+  (fp_line (start -2.35 1.15) (end -2.35 -1.15) (layer B.CrtYd) (width 0.05))
+
+  ; Fab outline — both sides
+  (fp_line (start -1.4 -0.9) (end 1.4 -0.9) (layer F.Fab) (width 0.1))
+  (fp_line (start 1.4 -0.9) (end 1.4 0.9) (layer F.Fab) (width 0.1))
+  (fp_line (start 1.4 0.9) (end -1.4 0.9) (layer F.Fab) (width 0.1))
+  (fp_line (start -1.4 0.9) (end -1.4 -0.9) (layer F.Fab) (width 0.1))
+  (fp_line (start -1.4 -0.9) (end 1.4 -0.9) (layer B.Fab) (width 0.1))
+  (fp_line (start 1.4 -0.9) (end 1.4 0.9) (layer B.Fab) (width 0.1))
+  (fp_line (start 1.4 0.9) (end -1.4 0.9) (layer B.Fab) (width 0.1))
+  (fp_line (start -1.4 0.9) (end -1.4 -0.9) (layer B.Fab) (width 0.1))
+
+  ; Pads — both F.Cu and B.Cu at same positions
+  (pad 1 smd roundrect (at -1.65 0) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) (roundrect_rratio 0.25))
+  (pad 1 smd roundrect (at -1.65 0) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) (roundrect_rratio 0.25))
+  (pad 2 smd roundrect (at 1.65 0) (size 0.9 1.2) (layers F.Cu F.Paste F.Mask) (roundrect_rratio 0.25))
+  (pad 2 smd roundrect (at 1.65 0) (size 0.9 1.2) (layers B.Cu B.Paste B.Mask) (roundrect_rratio 0.25))
+)
