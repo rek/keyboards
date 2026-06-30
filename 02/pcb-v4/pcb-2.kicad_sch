@@ -552,7 +552,7 @@
 					)
 				)
 			)
-			(property "Footprint" "Scotto Components:Diode_SOD-123"
+			(property "Footprint" "Library:Diode_SOD-123_reversible"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -924,7 +924,7 @@
 					)
 				)
 			)
-			(property "Footprint" "ScottoKeebs_Components:TRRS_PJ-320A"
+			(property "Footprint" "Library:TRRS_PJ-320A_reversible"
 				(at 3.81 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2368,7 +2368,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 143.51 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -2450,7 +2450,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 90.17 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -2552,7 +2552,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 101.6 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -2634,7 +2634,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 132.08 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -2738,7 +2738,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 118.11 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -2842,7 +2842,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 118.11 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -2944,7 +2944,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 87.63 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -3024,7 +3024,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 129.54 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -3104,7 +3104,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 143.51 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -3186,7 +3186,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 160.02 130.81 0)
 			(hide yes)
 			(show_name no)
@@ -3290,7 +3290,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 90.17 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -3392,7 +3392,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 143.51 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -3472,7 +3472,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 87.63 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -3554,7 +3554,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 146.05 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -3658,7 +3658,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 160.02 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -3762,7 +3762,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 146.05 130.81 0)
 			(hide yes)
 			(show_name no)
@@ -3866,7 +3866,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 160.02 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -3968,7 +3968,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 115.57 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -4048,7 +4048,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 157.48 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -4130,7 +4130,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 104.14 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -4234,7 +4234,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 146.05 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -4336,7 +4336,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 115.57 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -4418,7 +4418,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 160.02 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -4520,7 +4520,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 115.57 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -4602,7 +4602,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 104.14 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -4850,7 +4850,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 157.48 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -4932,7 +4932,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 104.14 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -5036,7 +5036,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 146.05 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -5138,7 +5138,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 143.51 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -5220,7 +5220,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 118.11 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -5322,7 +5322,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 101.6 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -5402,7 +5402,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 129.54 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -5484,7 +5484,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 132.08 130.81 0)
 			(hide yes)
 			(show_name no)
@@ -5588,7 +5588,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 132.08 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -5690,7 +5690,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 101.6 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -5772,7 +5772,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 132.08 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -5876,7 +5876,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "ScottoKeebs_Components:TRRS_PJ-320A"
+		(property "Footprint" "Library:TRRS_PJ-320A_reversible"
 			(at 229.87 147.32 0)
 			(hide yes)
 			(show_name no)
@@ -5962,7 +5962,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 87.63 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -6042,7 +6042,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 129.54 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -6122,7 +6122,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 157.48 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -6202,7 +6202,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 129.54 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -6284,7 +6284,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Scotto Components:Diode_SOD-123"
+		(property "Footprint" "Library:Diode_SOD-123_reversible"
 			(at 90.17 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -6386,7 +6386,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_Switch_Keyboard_Hotswap_Kailh:SW_Hotswap_Kailh_Choc_V1"
+		(property "Footprint" "Library:Kailh_socket_PG1350_reversible"
 			(at 157.48 59.69 0)
 			(hide yes)
 			(show_name no)
