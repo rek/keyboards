@@ -1,0 +1,10 @@
+# Board/shield combos to build. Each produces a .uf2 you drag onto the nice!nano.
+# nice_nano_v2 = the wireless controller; lily58_left / lily58_right = the two halves.
+include:
+  - board: nice_nano_v2
+    shield: lily58_left
+  - board: nice_nano_v2
+    shield: lily58_right
+  # Optional: a USB settings-reset image, handy if BLE pairing gets stuck.
+  # - board: nice_nano_v2
+  #   shield: settings_reset
