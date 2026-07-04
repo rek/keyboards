@@ -5,8 +5,8 @@
 	(uuid "a558719f-703a-45f2-bed0-8fdfbe3ba4bd")
 	(paper "A4")
 	(title_block
-		(date "2024-06-15")
-		(rev "2.0")
+		(date "2026-06-02")
+		(rev "2.1")
 	)
 	(lib_symbols
 		(symbol "ScottoSymbs:MCU_Arduino_Pro_Micro"
