@@ -8,14 +8,15 @@
 #define LOWER   1
 #define RAISE   2
 
-// REQUIRED kscan remap for the LEFT half only.
-// The left nice!nano is soldered into the "rightmost" staggered hole-set of the
-// Lily58 Pro's reversible footprint, which swaps rows<->cols vs the stock lily58
-// shield. This override matches the holes actually used (no desolder).
-//   rows row0..4 -> pro_micro 18,15,14,16,10  (stock left: 5,6,7,8,9)
-//   cols col0..5 -> pro_micro 4,5,6,7,8,9      (stock left: 19,18,15,14,16,10)
-// The RIGHT half is wired differently (stock cols are reversed) — it builds with
-// the stock mapping unless we confirm it also needs a remap. See README.
+// REQUIRED kscan remaps — BOTH halves are soldered into the "swapped" hole-set
+// of the Lily58 Pro's reversible footprint (rows<->cols swapped vs the stock
+// shield). Derived from the Lily58_Pro.kicad_pcb pad->net map; both CONFIRMED
+// working 2026-07-05.
+//   left:  rows -> pro_micro 18,15,14,16,10   cols -> 4,5,6,7,8,9
+//   right: rows -> pro_micro 18,15,14,16,10   cols -> 9,8,7,6,5,4  (mirrored)
+// NOTE: these #ifdef guards only work because build-flash.sh injects the define
+// via -DDTS_EXTRA_CPPFLAGS — devicetree is preprocessed BEFORE Kconfig, so
+// CONFIG_* is otherwise invisible here. See BUILDING.md.
 #ifdef CONFIG_SHIELD_LILY58_LEFT
 &kscan0 {
     row-gpios
@@ -36,9 +37,25 @@
 };
 #endif
 
-// RIGHT half: nice!nano was soldered into the OPPOSITE set from the left — i.e.
-// the STOCK/correct set — so the right needs NO remap and uses the stock
-// lily58_right wiring. (Confirmed by the user 2026-06-28.)
+#ifdef CONFIG_SHIELD_LILY58_RIGHT
+&kscan0 {
+    row-gpios
+        = <&pro_micro 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&pro_micro 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&pro_micro 14 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&pro_micro 16 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&pro_micro 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        ;
+    col-gpios
+        = <&pro_micro 9 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 8 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 7 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 6 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 5 GPIO_ACTIVE_HIGH>
+        , <&pro_micro 4 GPIO_ACTIVE_HIGH>
+        ;
+};
+#endif
 
 / {
     keymap {
@@ -80,13 +97,13 @@
 
         raise_layer {
 // ------------------------------------------------------------------------------------------
-// | BTCLR| BT0 | BT1 | BT2 | BT3 | BT4 |                   |     |     |     |     |     |      |
+// | BTCLR| BT0 | BT1 | BT2 | BT3 | BT4 |                   |     |     |     |     |     | STUDIO UNLOCK |
 // |  TAB |     |     |     |     |     |                   | PGUP|     | UP  |     |     |      |
 // | CAPS |     |     |     |     |     |                   | PGDN| LFT | DWN | RGT |     |      |
 // |      |     |     |     |     |     |      |   |        | HOME| END |     |     |     |      |
 //                    |     |     |     |      |   |        |     |     |     |
             bindings = <
-&bt BT_CLR  &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4               &trans    &trans    &trans   &trans     &trans &trans
+&bt BT_CLR  &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4               &trans    &trans    &trans   &trans     &trans &studio_unlock
 &kp TAB     &trans       &trans       &trans       &trans       &trans                     &kp PG_UP &trans    &kp UP   &trans     &trans &trans
 &kp CAPS    &trans       &trans       &trans       &trans       &trans                     &kp PG_DN &kp LEFT  &kp DOWN &kp RIGHT  &trans &trans
 &trans      &trans       &trans       &trans       &trans       &trans   &trans   &trans   &kp HOME  &kp END   &trans   &trans     &trans &trans

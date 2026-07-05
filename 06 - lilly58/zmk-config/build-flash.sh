@@ -39,8 +39,14 @@ rm -rf "$STAGE"; mkdir -p "$STAGE"; cp -R "$CONFIG_SRC/." "$STAGE/"
 echo ">> building $SHIELD"
 cd "$WS/zmk"
 rm -rf "build/$SIDE"
+# Devicetree (incl. the keymap) is preprocessed BEFORE Kconfig, so the keymap's
+# "#ifdef CONFIG_SHIELD_LILY58_LEFT" guard around the kscan remap sees nothing
+# unless we inject the define into the DTS preprocessor ourselves. Without this
+# the left builds with STOCK pins and types nothing (bit us 2026-06-28..07-05).
+SIDE_UPPER=$(echo "$SIDE" | tr '[:lower:]' '[:upper:]')
 west build -s app -d "build/$SIDE" -b "$BOARD" -- \
-  -DSHIELD="$SHIELD" -DZMK_CONFIG="$STAGE"
+  -DSHIELD="$SHIELD" -DZMK_CONFIG="$STAGE" \
+  -DDTS_EXTRA_CPPFLAGS="-DCONFIG_SHIELD_LILY58_${SIDE_UPPER}"
 
 UF2="$WS/zmk/build/$SIDE/zephyr/zmk.uf2"
 echo ">> built: $UF2 ($(du -h "$UF2" | cut -f1))"

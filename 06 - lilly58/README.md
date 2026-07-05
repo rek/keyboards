@@ -2,6 +2,10 @@
 
 A split 58-key Lily58 **Pro** keyboard running **wireless ZMK** on a **nice!nano v2** per half.
 
+> 📌 **Bring-up in progress — if you're picking this up, read [`HANDOFF.md`](HANDOFF.md) first.**
+> It has the current state, all hard-won learnings, and the exact clean-restart steps.
+> **To build/flash firmware, follow [`BUILDING.md`](BUILDING.md)** — the canonical, journey-free procedure.
+
 ## At a glance
 
 | | |
@@ -13,7 +17,7 @@ A split 58-key Lily58 **Pro** keyboard running **wireless ZMK** on a **nice!nano
 | **Firmware** | `zmk-config/` (this folder) |
 | **Case** | `case/v1/` STLs |
 | **Matrix** | 5 rows × 6 cols per half |
-| **Status** | Left half flashed + matrix confirmed working (1 switch tested). See *To-do*. |
+| **Status** | ✅ **Working end-to-end** (2026-07-05): both halves remapped, bonded, typing over USB and host Bluetooth, batteries connected. **ZMK Studio enabled** for live key editing (see [`BUILDING.md`](BUILDING.md)). Remaining: install all switches, verify battery runtime, OLEDs. |
 
 ## ⚠️ The big gotcha: rows/cols are remapped
 
@@ -63,14 +67,21 @@ Near the controller: `RESET` (reset button), and the **I²C section** — `R1`/`
 
 ## To-do
 
-- [ ] Clean up `lily58.keymap` / `lily58.conf` — remove the `TEMP` diagnostic comments + debug log level (keep the remap).
-- [ ] Install the remaining switches in the left half.
-- [ ] Wire the battery (+ power switch) to the left nice!nano.
-- [ ] Build & flash the **right** half — check whether it needs the same kscan remap.
+**Immediate (see [`HANDOFF.md`](HANDOFF.md) for the exact clean-restart steps):**
+- [ ] Verify the **right half** end-to-end: `settings_reset` both halves → reflash normal → pair → press right switch through the central. Right is believed correct on **stock** wiring.
+- [ ] Confirm the left outputs to **USB** after `settings_reset` (kills the sticky-Bluetooth-output bug).
+
+**After it works:**
+- [ ] Install the remaining switches (both halves).
+- [ ] Wire the battery (+ optional power switch) to both nice!nanos.
+- [ ] Set output deliberately (`&out OUT_USB` if you want USB by default).
 - [ ] Optional: OLED (populate `R1`/`R2`, enable `CONFIG_ZMK_DISPLAY`).
+- [ ] Optional: move the left kscan override into a `lily58_left.overlay` (more idiomatic than in `.keymap`).
 
-## Debugging notes (things that wasted time, for next builder)
+## Debugging notes (things that wasted time — full detail in [`HANDOFF.md`](HANDOFF.md))
 
-- Board was **BLE-paired to the PC**, so keystrokes went to the Bluetooth input device (`event6`), not USB (`event5`) — watch *both* when testing.
-- Only **one switch** was installed during bring-up, so multi-key "press everything" tests were meaningless — unpopulated positions are open circuits.
-- USB serial logging: use the `-S zmk-usb-logging` build snippet (ZMK's log level already defaults to debug). Do **not** set `CONFIG_LOG_DEFAULT_LEVEL=4` globally — it floods the USB stack and hangs boot. Reading `/dev/ttyACM0` needs root/`uucp`.
+- **Output endpoint (USB vs BLE) persists in flash and survives reflashing** — the #1 time-sink. Fix with `&out OUT_USB` or the `settings_reset` shield, not reflashing. Watch **both** the USB and Bluetooth `event-kbd` devices when testing.
+- **Charge-only cables** = board powers (LED on) but nothing enumerates on USB (not even the bootloader drive). Use a known data cable, straight to the PC.
+- **A peripheral (right) doesn't type over USB alone** — test it paired with the central. The `CONFIG_ZMK_SPLIT=n` standalone trick gives **false negatives** — don't trust it.
+- **USB serial logging builds hang at boot** here (known ZMK bugs) — avoid.
+- **Label the halves L/R** — juggling one cable between unlabelled boards scrambled which firmware was where.
