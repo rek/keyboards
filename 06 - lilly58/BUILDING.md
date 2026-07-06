@@ -53,10 +53,21 @@ Layout after setup: `~/dev/zmk-workspace/{.venv, zmk/{app, zephyr, modules, buil
 ## Build + flash (the canonical path)
 
 ```sh
-"06 - lilly58/zmk-config/build-flash.sh" left            # build + flash left
-"06 - lilly58/zmk-config/build-flash.sh" right           # build + flash right
-"06 - lilly58/zmk-config/build-flash.sh" left --no-flash # build only
+"06 - lilly58/zmk-config/build-flash.sh" left            # daily driver: Studio + battery proxy
+"06 - lilly58/zmk-config/build-flash.sh" left --no-batt  # fallback: Studio, battery proxy OFF
+"06 - lilly58/zmk-config/build-flash.sh" right           # right half (peripheral)
+"06 - lilly58/zmk-config/build-flash.sh" left --no-flash # any of the above, build only
 ```
+
+Two left variants, both ZMK-Studio-enabled:
+
+- **`left`** → `build/left-studio` — the canonical image: Studio + per-half
+  battery reporting to the host (verified end-to-end 2026-07-06). Flash this.
+- **`left --no-batt`** → `build/left-studio-nobat` — identical minus the second
+  battery GATT service (disabled via Kconfig CLI overrides, which beat
+  `lily58_left.conf`). Diagnostic fallback only: flash it to rule the dual
+  battery service out if some host refuses to pair. Not fully re-tested since
+  the battery path became canonical — expect to fix it up before relying on it.
 
 The script encapsulates three **mandatory** quirks — if building by hand, you
 must reproduce all three:
@@ -101,8 +112,9 @@ The settings-reset image is built the same way with `-DSHIELD=settings_reset`
 
 ## ZMK Studio (live keymap editing, no reflash per change)
 
-The daily-driver **left** image is the Studio-enabled one at `build/left-studio`
-(flashed 2026-07-05). Build it with:
+**Every left image the script produces is Studio-enabled** — `build-flash.sh
+left` is all you need (it adds `-S studio-rpc-usb-uart` +
+`-DCONFIG_ZMK_STUDIO=y` itself). Equivalent manual command:
 
 ```sh
 cd ~/dev/zmk-workspace/zmk
@@ -141,6 +153,61 @@ Why the reset step: ZMK persists the chosen output endpoint (USB/BLE) and the
 split bond **in flash; both survive reflashing**. A stale BLE endpoint sends
 keystrokes into the void; a half-reset bond pair won't re-pair. `settings_reset`
 on **both** halves clears both problems.
+
+## Pairing to a Linux host (bluetoothctl)
+
+A plain `bluetoothctl pair <MAC>` one-shot **fails with
+`org.bluez.Error.AuthenticationFailed`** even when everything is healthy —
+pairing must run in an interactive session with an agent registered. And if the
+keyboard's active BT profile holds a stale bond for this host (after a
+`settings_reset`, host reinstall, etc.), it rejects pairing until cleared.
+Both fixes, in order (2026-07-06, cost an evening):
+
+1. **Keyboard**: clear the active profile's bond — hold **RAISE** (right-half
+   thumb key right of Enter) + tap **ESC** (top-left key) = `&bt BT_CLR`.
+   Needs both halves on and linked. RAISE + number-row 1–5 selects profiles
+   0–4 if you want to keep other hosts' bonds.
+2. **Host** (interactive `bluetoothctl`):
+
+   ```
+   remove <MAC>          # drop any half-dead host-side entry first
+   agent NoInputNoOutput
+   default-agent
+   scan on               # wait for "Lily58" to appear
+   pair <MAC>
+   trust <MAC>           # required for auto-reconnect
+   connect <MAC>
+   ```
+
+No passkey is configured — pairing is BLE "Just Works". Verify with
+`bluetoothctl info <MAC>`: Paired/Bonded/Trusted/Connected all `yes`, and the
+device appears in `/proc/bus/input/devices` as `Lily58 Keyboard`.
+
+## Battery levels (both halves)
+
+The canonical left image exposes **two** GATT Battery Services (0x180f) to the
+host: the primary = left/central, a secondary = right/peripheral, proxied over
+the split link (`lily58_left.conf`: `..._BATTERY_LEVEL_FETCHING` + `_PROXY`).
+
+- The peripheral reports every **60 s** once its split link is up; until the
+  first report (or while the right is asleep/off) the proxy reads **0** — not a
+  fault.
+- **`upower` and desktop BT menus only show the FIRST battery instance** (the
+  left half). Read both directly (service handles from `gatt.list-attributes`;
+  on this machine left = `service0010/char0011`, right = `service0015/char0016`):
+
+  ```sh
+  busctl call org.bluez /org/bluez/hci0/dev_<MAC_>/service0015/char0016 \
+    org.bluez.GattCharacteristic1 ReadValue 'a{sv}' 0   # right half, e.g. "ay 1 75"
+  ```
+
+  (`bluetoothctl`'s gatt output is full of ANSI escapes — busctl is the
+  scriptable path.) ZMK Studio also shows both halves.
+- A half on USB reads ~100% while charging.
+- If a host ever refuses to pair and you suspect the dual battery service,
+  `build-flash.sh left --no-batt` produces the same image minus the second
+  service. (The one time this was suspected, it was innocent — see the pairing
+  section above.)
 
 ## Verifying keystrokes on this machine (Arch + keyd + Hyprland)
 
