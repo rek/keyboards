@@ -1,0 +1,95 @@
+name: Build lilly58 (06)
+
+# Builds the ZMK firmware for 06 - lilly58 from its monorepo subfolder.
+# Custom (non-reusable) workflow: the stock zmkfirmware reusable workflow can't
+# reliably build from a subdirectory (upstream PR #2975 unmerged) and its unquoted
+# paths break on the space in "06 - lilly58". Here west init/update/build all run
+# with working-directory set to the config subfolder, and every path is quoted.
+
+on:
+  push:
+    paths:
+      - "06 - lilly58/zmk-config/**"
+      - ".github/workflows/lilly58.yml"
+  pull_request:
+    paths:
+      - "06 - lilly58/zmk-config/**"
+  workflow_dispatch:
+
+env:
+  CONFIG_DIR: "06 - lilly58/zmk-config"
+
+jobs:
+  matrix:
+    runs-on: ubuntu-22.04
+    outputs:
+      build_matrix: ${{ steps.fetch.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: fetch
+        run: |
+          m=$(yq -oj -I0 '.' "$CONFIG_DIR/build.yaml")
+          echo "matrix=$m" >> "$GITHUB_OUTPUT"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: matrix
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.build_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare vars
+        env:
+          board: ${{ matrix.board }}
+          shield: ${{ matrix.shield }}
+        run: |
+          echo "build_dir=$(mktemp -d)" >> "$GITHUB_ENV"
+          echo "artifact_name=${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
+          echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"}" >> "$GITHUB_ENV"
+
+      - name: West init
+        working-directory: ${{ env.CONFIG_DIR }}
+        run: west init -l config
+
+      - name: West update
+        working-directory: ${{ env.CONFIG_DIR }}
+        run: west update --fetch-opt=--filter=tree:0
+
+      - name: West zephyr-export
+        working-directory: ${{ env.CONFIG_DIR }}
+        run: west zephyr-export
+
+      - name: West build
+        working-directory: ${{ env.CONFIG_DIR }}
+        shell: sh -x {0}
+        run: |
+          west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" -- \
+            -DZMK_CONFIG="$PWD/config" ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p "${{ env.build_dir }}/artifacts"
+          if [ -f "${{ env.build_dir }}/zephyr/zmk.uf2" ]; then
+            cp "${{ env.build_dir }}/zephyr/zmk.uf2" "${{ env.build_dir }}/artifacts/${{ env.artifact_name }}.uf2"
+          else
+            cp "${{ env.build_dir }}/zephyr/zmk.bin" "${{ env.build_dir }}/artifacts/${{ env.artifact_name }}.bin"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ env.artifact_name }}
+          path: ${{ env.build_dir }}/artifacts
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/upload-artifact/merge@v4
+        with:
+          name: lilly58-firmware
+          pattern: artifact-*
+          delete-merged: true
