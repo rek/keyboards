@@ -1,0 +1,19 @@
+# --- KiCad noise ---
+# plugin/editor local history
+.history/
+# footprint info cache, regenerated on open
+fp-info-cache
+# KiCad 6+ automatic backup archives
+*-backups/
+# manual/one-off backups (*.bak, *.bak_courtyard, *.preZonefix.bak, ...)
+*.bak
+*.bak_*
+# autosave + lock files
+~_autosave-*
+_autosave-*
+*.lck
+# gerber_to_order plugin output (regenerated per export)
+gerber_to_order/
+
+# --- tooling ---
+.serena/
