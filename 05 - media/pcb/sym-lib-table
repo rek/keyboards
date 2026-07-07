@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "nice_nano")(type "KiCad")(uri "/home/adam/dev/keyboards/05 - media/pcb/libs/nice_nano.kicad_sym")(options "")(descr ""))
+)
