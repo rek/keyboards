@@ -98,7 +98,8 @@ PATH=~/dev/zmk-workspace/.venv/bin:$PATH west build -s app -d build/left -p \
 **Always verify the image before flashing** (guards against the silent-stock-pins failure):
 
 ```sh
-grep -A6 'kscan0: kscan' ~/dev/zmk-workspace/zmk/build/left/zephyr/zephyr.dts
+grep -A6 'kscan0: kscan' ~/dev/zmk-workspace/zmk/build/<dir>/zephyr/zephyr.dts
+# <dir> = left-studio | left-studio-nobat | right
 # BOTH halves MUST show rows 0x12 0xf 0xe 0x10 0xa.
 # left cols MUST be 0x4 0x5 0x6 0x7 0x8 0x9; right cols 0x9 0x8 0x7 0x6 0x5 0x4.
 # If you see rows 0x5–0x9, the remap got dropped — do not flash.
@@ -136,14 +137,16 @@ PATH=~/dev/zmk-workspace/.venv/bin:$PATH west build -s app -d build/left-studio 
 - Studio edits live in the keyboard's settings storage, NOT in `lily58.keymap` —
   a `settings_reset` wipes them, and the `.keymap` file is what rebuilds use.
   Mirror any layout you want to keep back into the file.
-- The plain (non-Studio) left image remains at `build/left`.
+- There is no kept plain (non-Studio) left image — every scripted left build is
+  Studio-enabled. If one is ever needed, use the manual command above (it
+  builds to `build/left`).
 
 ## Clean pairing procedure (whenever bonds/output are suspect)
 
 Order matters; one board plugged in at a time.
 
 1. Left: double-tap → flash `settings_reset` → let boot 5 s → double-tap →
-   flash `build/left`.
+   flash `build/left-studio`.
 2. Unplug left. Right: same two-step with `build/right`.
 3. Power both together (left USB, right battery). They auto-bond in ~10–15 s.
 4. All typing (both halves) comes out of the **left/central**. The right never
