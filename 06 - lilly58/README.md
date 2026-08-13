@@ -61,6 +61,11 @@ The Lily58 Pro has **no battery provision** (it's a wired design). The LiPo wire
 - Use thin 30 AWG / magnet wire; secure the cell so it can't be punctured.
 - ❌ Do **not** wire the battery to `RAW`/`GND` — that bypasses charging.
 
+To show both halves' charge in a desktop status bar, see
+[`HOST-BATTERY.md`](HOST-BATTERY.md) — the right half is proxied as a second BLE
+battery service and needs a GATT walk to read, and there is **no** battery
+readout over USB at all.
+
 ## What the extra PCB holes are (all optional for wireless)
 
 Near the controller: `RESET` (reset button), and the **I²C section** — `R1`/`R2` (SDA/SCL pull-up resistors), `P1`/`P2` (I²C breakout pads), `J2` (TRRS jack, `MJ-4PP-9`). These exist for the **wired QMK** build (halves talk over I²C through the TRRS cable) and the OLED. **For our wireless build none are needed** — only populate `R1`/`R2` if you add the I²C **OLED** screen (then also enable `CONFIG_ZMK_DISPLAY` in `lily58.conf`).
