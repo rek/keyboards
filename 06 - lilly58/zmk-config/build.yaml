@@ -3,8 +3,12 @@
 include:
   - board: nice_nano_v2
     shield: lily58_left
+    # Studio RPC rides a USB CDC-ACM endpoint on the central half only.
+    snippet: studio-rpc-usb-uart
   - board: nice_nano_v2
     shield: lily58_right
-  # Optional: a USB settings-reset image, handy if BLE pairing gets stuck.
-  # - board: nice_nano_v2
-  #   shield: settings_reset
+  # A USB settings-reset image: wipes ALL stored BLE bonds/profiles on whichever
+  # half it is flashed to. Flash it, let it run ~10s, then flash the real
+  # firmware back. Both halves must be reset together or they will not re-pair.
+  - board: nice_nano_v2
+    shield: settings_reset
