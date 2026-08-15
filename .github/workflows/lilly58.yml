@@ -46,6 +46,9 @@ jobs:
         env:
           board: ${{ matrix.board }}
           shield: ${{ matrix.shield }}
+        # bash, not sh: the lines below use ${var//x/y} and ${var:+...}, which
+        # dash (the runner's /bin/sh) rejects with "Bad substitution".
+        shell: bash
         run: |
           echo "build_dir=$(mktemp -d)" >> "$GITHUB_ENV"
           echo "artifact_name=${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
@@ -67,7 +70,8 @@ jobs:
         working-directory: ${{ env.CONFIG_DIR }}
         shell: sh -x {0}
         run: |
-          west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" -- \
+          west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" \
+            ${{ matrix.snippet && format('-S {0}', matrix.snippet) || '' }} -- \
             -DZMK_CONFIG="$PWD/config" ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
 
       - name: Collect artifacts
