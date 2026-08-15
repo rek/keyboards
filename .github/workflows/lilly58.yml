@@ -53,6 +53,11 @@ jobs:
           echo "build_dir=$(mktemp -d)" >> "$GITHUB_ENV"
           echo "artifact_name=${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
           echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"}" >> "$GITHUB_ENV"
+          # lily58.keymap gates its kscan remaps on CONFIG_SHIELD_LILY58_{LEFT,RIGHT},
+          # but Zephyr preprocesses devicetree BEFORE Kconfig, so those macros are
+          # undefined unless injected here. Without this the build is green and the
+          # firmware ships STOCK pins — the board enumerates and types nothing.
+          echo "dts_cppflags=${shield:+-DDTS_EXTRA_CPPFLAGS=-DCONFIG_SHIELD_$(echo "$shield" | tr '[:lower:]' '[:upper:]')}" >> "$GITHUB_ENV"
 
       # NB: no `working-directory:` on the steps below. For container jobs the
       # runner splices that path into `docker exec` unquoted, so the space in
@@ -73,7 +78,7 @@ jobs:
           cd "$CONFIG_DIR"
           west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" \
             ${{ matrix.snippet && format('-S {0}', matrix.snippet) || '' }} -- \
-            -DZMK_CONFIG="$PWD/config" ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
+            -DZMK_CONFIG="$PWD/config" ${{ env.extra_cmake_args }} ${{ env.dts_cppflags }} ${{ matrix.cmake-args }}
 
       - name: Collect artifacts
         run: |

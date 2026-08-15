@@ -1,14 +1,14 @@
 # Board/shield combos to build. Each produces a .uf2 you drag onto the nice!nano.
-# nice_nano_v2 = the wireless controller; lily58_left / lily58_right = the two halves.
+# Board id is HWMv2 (ZMK main): nice_nano@2.0.0/nrf52840/zmk — NOT nice_nano_v2.
 include:
-  - board: nice_nano_v2
+  - board: "nice_nano@2.0.0/nrf52840/zmk"
     shield: lily58_left
     # Studio RPC rides a USB CDC-ACM endpoint on the central half only.
     snippet: studio-rpc-usb-uart
-  - board: nice_nano_v2
+  - board: "nice_nano@2.0.0/nrf52840/zmk"
     shield: lily58_right
   # A USB settings-reset image: wipes ALL stored BLE bonds/profiles on whichever
   # half it is flashed to. Flash it, let it run ~10s, then flash the real
   # firmware back. Both halves must be reset together or they will not re-pair.
-  - board: nice_nano_v2
+  - board: "nice_nano@2.0.0/nrf52840/zmk"
     shield: settings_reset
