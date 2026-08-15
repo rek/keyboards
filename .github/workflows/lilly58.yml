@@ -54,22 +54,23 @@ jobs:
           echo "artifact_name=${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
           echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"}" >> "$GITHUB_ENV"
 
+      # NB: no `working-directory:` on the steps below. For container jobs the
+      # runner splices that path into `docker exec` unquoted, so the space in
+      # "06 - lilly58" splits it and the bare "-" is read as the container name
+      # ("No such container: -"). cd inside the script, where we control quoting.
       - name: West init
-        working-directory: ${{ env.CONFIG_DIR }}
-        run: west init -l config
+        run: cd "$CONFIG_DIR" && west init -l config
 
       - name: West update
-        working-directory: ${{ env.CONFIG_DIR }}
-        run: west update --fetch-opt=--filter=tree:0
+        run: cd "$CONFIG_DIR" && west update --fetch-opt=--filter=tree:0
 
       - name: West zephyr-export
-        working-directory: ${{ env.CONFIG_DIR }}
-        run: west zephyr-export
+        run: cd "$CONFIG_DIR" && west zephyr-export
 
       - name: West build
-        working-directory: ${{ env.CONFIG_DIR }}
         shell: sh -x {0}
         run: |
+          cd "$CONFIG_DIR"
           west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" \
             ${{ matrix.snippet && format('-S {0}', matrix.snippet) || '' }} -- \
             -DZMK_CONFIG="$PWD/config" ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
