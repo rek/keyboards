@@ -186,6 +186,56 @@ No passkey is configured — pairing is BLE "Just Works". Verify with
 `bluetoothctl info <MAC>`: Paired/Bonded/Trusted/Connected all `yes`, and the
 device appears in `/proc/bus/input/devices` as `Lily58 Keyboard`.
 
+### Symptom → cause: bonds and the output endpoint (2026-08-15, cost a session)
+
+Two independent faults that both present as "the keyboard doesn't work", and
+which mimic each other closely enough to send you chasing cables for hours.
+
+**1. Stale bond — the keyboard's key outlives the host's.**
+BLE bonding is symmetric: host and keyboard each store their own LTK, and the
+protocol has **no message meaning "I deleted your key"**. Clicking *Forget* /
+*Remove* in a desktop Bluetooth UI wipes only the host's copy (a plain
+*Disconnect* is harmless — the two sit next to each other in most UIs). The
+keyboard then reconnects with an LTK the host can't match. Signatures:
+
+- `LE.Disconnected — org.bluez.Reason.Local, terminated by local host`, on a loop
+- `bluetoothctl pair` **hangs with no result**, and the next command returns
+  `org.bluez.Error.InProgress` because the first request is still pending
+- `Paired: no` / `Bonded: no` while `Connected` flaps yes/no
+- **Or the keyboard stops advertising entirely** — ZMK only advertises on an
+  *unbonded* profile, so a slot bonded to another host goes silent. A scan that
+  sees other devices but never `Lily58` means "bonded elsewhere", not "dead".
+
+The spec's own escape hatch (host replies SMP `0x06` "PIN or Key Missing",
+peripheral drops its bond and re-pairs) is **not reliably acted on by ZMK** —
+sticky profiles are a deliberate tradeoff. `BT_CLR` is the intended fix, but its
+effect is unverifiable from the host, and it spans BOTH halves (RAISE is on the
+right, `BT_CLR` on the left) so it silently does nothing if the split link is
+down. When in doubt skip it and use `settings_reset` on both halves — that is
+the only fix that can be *confirmed*.
+
+**2. Output endpoint stuck on BLE — "types for a few seconds, then stops".**
+The classic misdiagnosis. After a reset the board types over USB, then seconds
+later goes dead while `lsusb` still shows it and no USB error appears. It has
+not crashed: a BLE profile connected, ZMK moved its HID endpoint there, and the
+keystrokes now vanish into a half-open link. Distinguish in one command:
+
+```sh
+journalctl -k --since "5 min ago" | grep -iE "usb 3-|disconnect"
+```
+
+- **`USB disconnect` + re-enumeration** → real USB fault (cable, worn micro-USB
+  jack, unpowered hub). Device number climbing across a session is the tell.
+- **No USB events at all** → the endpoint moved. Not a hardware problem.
+
+To break the loop while diagnosing, stop the host accepting the link at all:
+`bluetoothctl block <MAC>` (reverse with `unblock`). USB then keeps the
+endpoint. Since 2026-08-15 the config prevents this by construction —
+`CONFIG_ZMK_USB=y` in `lily58.conf` makes USB win whenever a cable is present,
+and RAISE + `6`/`7`/`8` = `&out OUT_USB` / `OUT_BLE` / `OUT_TOG` for a manual
+override. Before that the keymap had no `&out` bind at all, so a stuck endpoint
+could only be cleared by `settings_reset`.
+
 ## Battery levels (both halves)
 
 The canonical left image exposes **two** GATT Battery Services (0x180f) to the
