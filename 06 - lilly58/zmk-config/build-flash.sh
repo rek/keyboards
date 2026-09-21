@@ -43,7 +43,7 @@ for arg in "$@"; do
   esac
 done
 
-WS=/home/adam/dev/zmk-workspace
+WS="${ZMK_WS:-$HOME/dev/zmk-workspace}"   # override with ZMK_WS=/path
 CONFIG_SRC="$(cd "$(dirname "$0")/config" && pwd)"
 STAGE="$WS/lily58-config"            # space-free staging path
 BOARD="nice_nano@2.0.0/nrf52840/zmk"
