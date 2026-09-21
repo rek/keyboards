@@ -68,7 +68,7 @@ cd "06 - lilly58/zmk-config"
 
 1. installs the Arch packages (`git arm-none-eabi-gcc arm-none-eabi-newlib cmake ninja dtc python udisks2 bluez bluez-utils usbutils`),
 2. enables the `bluetooth` service,
-3. builds the ZMK workspace at `~/dev/zmk-workspace` (about 1.8 GB; set `ZMK_WS=/other/path` to move it). A **new** clone is pinned to the ZMK commit this build was tested on. `--latest` tracks `main` instead. An existing workspace is never moved,
+3. builds the ZMK workspace at `~/dev/zmk-workspace` (set `ZMK_WS=/other/path` to move it). It uses shallow fetches (one commit each, no history), which is much smaller and faster than a full clone. A **new** clone is pinned to the ZMK commit this build was tested on. `--latest` tracks `main` instead. An existing workspace is never moved,
 4. writes the udev rule that lets you open the Studio serial port,
 5. builds the `settings_reset` image (`build-flash.sh` only builds left/right).
 
@@ -139,7 +139,7 @@ when it's showing as a `NICENANO` drive.
 | Studio build fails in nanopb, or on protobuf | `protobuf` / `grpcio-tools` missing from the venv | `~/dev/zmk-workspace/.venv/bin/pip install protobuf grpcio-tools`, then **re-run** — the first build after installing can fail once |
 | `west` or compiler not found | venv not on `PATH` / toolchain variables unset | Use `build-flash.sh`, which sets `ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb` and `GNUARMEMB_TOOLCHAIN_PATH=/usr` |
 | `build-flash.sh` can't find the workspace | Workspace isn't at `~/dev/zmk-workspace` | `export ZMK_WS=/your/path` (both `build-flash.sh` and `doctor.sh` honour it) |
-| A build that worked last month now fails | `west.yml` tracks ZMK `main`, which moves | Pin it. `doctor.sh setup` already pins new workspaces to the known-good ZMK `64daf698e073e37b6748ac54f4eb48d8666af0b9` (2026-06-20, Zephyr `v4.1.0+zmk-fixes`). For an older workspace: `git -C ~/dev/zmk-workspace/zmk checkout 64daf698 && (cd ~/dev/zmk-workspace/zmk && ../.venv/bin/west update)`. The cloud build tracks `main` (`config/west.yml`); put the hash in `revision:` there to pin it too |
+| A build that worked last month now fails | `west.yml` tracks ZMK `main`, which moves | Pin it. `doctor.sh setup` already pins new workspaces to the known-good ZMK `64daf698e073e37b6748ac54f4eb48d8666af0b9` (2026-06-20, Zephyr `v4.1.0+zmk-fixes`). For an older workspace: `git -C ~/dev/zmk-workspace/zmk fetch --depth=1 origin 64daf698e073e37b6748ac54f4eb48d8666af0b9 && git -C ~/dev/zmk-workspace/zmk checkout FETCH_HEAD && (cd ~/dev/zmk-workspace/zmk && ../.venv/bin/west update -n -o=--depth=1)`. The cloud build tracks `main` (`config/west.yml`); put the hash in `revision:` there to pin it too |
 | **Build is green but the keyboard types nothing** | Pin-map override silently dropped — see below | Verify `zephyr.dts` before flashing |
 
 ### B. Flashing
@@ -220,6 +220,9 @@ No passkey is configured — pairing is BLE "Just Works".
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| **"Failed to connect" and the keyboard isn't plugged in** | This build serves Studio over the **USB cable only**, not Bluetooth. No cable means no serial port, even though typing over Bluetooth works | Plug the **left** half into the PC with a data cable. `ls /dev/ttyACM*` should now show a port |
+| Keyboard is plugged in, but there's no `/dev/ttyACM*` | It's the **right** half (it has no Studio), or the left was flashed with an image built without Studio | Plug in the left half. Or rebuild it with `./build-flash.sh left`, which always includes Studio, and reflash |
+| Port exists but connecting fails or says busy | Another program has the port open: a second Studio tab, or ModemManager (can grab USB serial ports) | Close other Studio tabs. `sudo systemctl disable --now ModemManager`. `./doctor.sh check` warns if it's running |
 | No serial port, or permission denied | udev rule missing | `./doctor.sh setup`, then replug the left half. `/dev/ttyACM0` should be group `uucp` with an ACL entry |
 | Site can't connect | Studio needs Web Serial, which is Chromium-only | Use Chrome, Chromium or Edge at https://zmk.studio |
 | Connects but is read-only | Locked | Unlock with **RAISE + the top-right key of the right half** (`&studio_unlock`) |

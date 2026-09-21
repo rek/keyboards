@@ -29,6 +29,7 @@ BOARD="nice_nano@2.0.0/nrf52840/zmk"
 SELF=$(printf '%q' "$HERE/doctor.sh")          # %q: the repo path has spaces, hints must paste cleanly
 BF=$(printf '%q' "$HERE/build-flash.sh")
 KNOWN_GOOD_ZMK=64daf698e073e37b6748ac54f4eb48d8666af0b9   # 2026-06-20, builds + runs
+ZMK_URL=https://github.com/zmkfirmware/zmk.git
 UDEV_RULE=/etc/udev/rules.d/50-zmk-studio.rules
 UDEV_LINE='SUBSYSTEM=="tty", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="615e", TAG+="uaccess"'
 PKGS=(git arm-none-eabi-gcc arm-none-eabi-newlib cmake ninja dtc python udisks2 bluez bluez-utils usbutils)
@@ -102,7 +103,7 @@ check_workspace() {
       ok "ZMK is at the known-good commit"
     else
       info "ZMK at ${head:0:8}; known-good is ${KNOWN_GOOD_ZMK:0:8}. Only matters if a build breaks."
-      info "pin: git -C $WS/zmk checkout ${KNOWN_GOOD_ZMK:0:8} && (cd $WS/zmk && $WS/.venv/bin/west update)"
+      info "pin: git -C $WS/zmk fetch --depth=1 origin $KNOWN_GOOD_ZMK && git -C $WS/zmk checkout FETCH_HEAD && (cd $WS/zmk && $WS/.venv/bin/west update -n -o=--depth=1)"
     fi
   fi
   if grep -qE '/home/[A-Za-z]' "$HERE/build-flash.sh" 2>/dev/null; then
@@ -156,12 +157,25 @@ check_studio_access() {
   else
     warn "udev rule for the Studio serial port missing (only matters for live keymap editing)"; fix "$SELF setup"
   fi
-  local t
+  local t ports=0 usb_n
   for t in /dev/ttyACM*; do
     [[ -e $t ]] || continue
     udevadm info -q property -n "$t" 2>/dev/null | grep -q '^ID_MODEL=Lily58$' || continue
+    ports=$((ports + 1))
     if [[ -r $t && -w $t ]]; then ok "$t is accessible to you"; else bad "$t exists but you can't open it"; fix "$SELF setup, then replug the left half"; fi
   done
+  usb_n=$(lily_usb_list | grep -c .)
+  if ((usb_n == 0)); then
+    info "no keyboard on USB. Studio only works over the USB cable in this build (not Bluetooth):"
+    info "plug the LEFT half in with a data cable, then a serial port (/dev/ttyACM*) appears"
+  elif ((ports == 0)); then
+    warn "Lily58 is on USB but has no serial port, so ZMK Studio can't connect"
+    fix "it's probably the RIGHT half (no Studio there) — plug in the LEFT — or the left image was built without Studio (build-flash.sh left always includes it)"
+  fi
+  if systemctl is-active --quiet ModemManager 2>/dev/null; then
+    warn "ModemManager is running; it can grab USB serial ports and make Studio fail to connect"
+    fix "sudo systemctl disable --now ModemManager"
+  fi
 }
 
 check_bluetooth_stack() {
@@ -180,9 +194,19 @@ check_bluetooth_stack() {
   fi
 }
 
+# Prints "<port> <serial>" for each Lily58 on USB (reads sysfs; no root needed).
+lily_usb_list() {
+  local d
+  for d in "$USB_SYSFS"/*; do
+    [[ -r $d/idVendor && -r $d/idProduct ]] || continue
+    [[ $(<"$d/idVendor") == "$VID" && $(<"$d/idProduct") == "$PID" ]] || continue
+    echo "$(basename "$d") $(cat "$d/serial" 2>/dev/null)"
+  done
+}
+
 check_usb() {
   section "USB"
-  local d found=0 serial port n
+  local found=0 serial port n
   while read -r port serial; do
     [[ -n $port ]] || continue
     found=1; ok "Lily58 on USB at $port (serial ${serial:-unreadable})"
@@ -194,11 +218,7 @@ check_usb() {
         info "$n USB disconnect(s) in the last 10 min (a replug or reflash counts)"
       fi
     fi
-  done < <(for d in "$USB_SYSFS"/*; do
-    [[ -r $d/idVendor && -r $d/idProduct ]] || continue
-    [[ $(<"$d/idVendor") == "$VID" && $(<"$d/idProduct") == "$PID" ]] || continue
-    echo "$(basename "$d") $(cat "$d/serial" 2>/dev/null)"
-  done)
+  done < <(lily_usb_list)
   if lsblk -rno LABEL 2>/dev/null | grep -qx NICENANO; then
     info "a half is in bootloader mode (NICENANO drive mounted/visible)"; found=1
   fi
@@ -336,12 +356,18 @@ setup_workspace() {
   [[ -x $WS/.venv/bin/west ]] && skip "west" || run "$WS/.venv/bin/pip" install west || return 1
   if [[ -d $WS/zmk/.git ]]; then
     skip "ZMK clone (left where it is: $(git -C "$WS/zmk" rev-parse --short HEAD 2>/dev/null); known-good is ${KNOWN_GOOD_ZMK:0:8})"
+  elif ((LATEST)); then
+    run git clone --depth=1 "$ZMK_URL" "$WS/zmk" || return 1
   else
-    run git clone https://github.com/zmkfirmware/zmk.git "$WS/zmk" || return 1
-    ((LATEST)) || run git -C "$WS/zmk" checkout "$KNOWN_GOOD_ZMK" || return 1   # only ever on a fresh clone
+    # Shallow, but at the pinned commit: `git clone --depth=1` would fetch main's tip instead.
+    # GitHub serves any commit by hash. Only ever done on a fresh clone.
+    run git init -q "$WS/zmk" || return 1
+    run git -C "$WS/zmk" remote add origin "$ZMK_URL" || return 1
+    run git -C "$WS/zmk" fetch -q --depth=1 origin "$KNOWN_GOOD_ZMK" || return 1
+    run git -C "$WS/zmk" checkout -q FETCH_HEAD || return 1
   fi
   [[ -d $WS/zmk/.west ]] && skip "west init" || in_dir "$WS/zmk" "$WS/.venv/bin/west" init -l app || return 1
-  if [[ -d $WS/zmk/zephyr && -d $WS/zmk/modules ]]; then skip "west update"; else in_dir "$WS/zmk" "$WS/.venv/bin/west" update || return 1; fi
+  if [[ -d $WS/zmk/zephyr && -d $WS/zmk/modules ]]; then skip "west update"; else in_dir "$WS/zmk" "$WS/.venv/bin/west" update -n -o=--depth=1 || return 1; fi
   if "$WS/.venv/bin/python" -c 'import elftools, yaml, pykwalify' 2>/dev/null; then skip "Zephyr python requirements"
   else run "$WS/.venv/bin/pip" install -r "$WS/zmk/zephyr/scripts/requirements.txt" || return 1; fi
   if "$WS/.venv/bin/python" -c 'import google.protobuf, grpc_tools' 2>/dev/null; then skip "protobuf + grpcio-tools"
