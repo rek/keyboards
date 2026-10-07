@@ -189,14 +189,12 @@ Rows `0x5`–`0x9` mean the override was dropped. **Do not flash.**
 
 ### D. Bluetooth pairing and battery
 
-> **Host Bluetooth is disabled** since 2026-10-07 (`CONFIG_BT_MAX_CONN=1` on the
-> left; see the comment in `lily58_left.conf`). Host Bluetooth can't be fully
-> turned off on a split, because the half-to-half link needs it too. The left
-> keeps one BLE slot for the right half, so no host can connect, and battery
-> levels no longer reach the PC. This section only applies if you remove that line.
->
-> If the right half goes dead after boot, a host may have taken the slot before
-> the right half linked. Run `bluetoothctl devices` and `remove` any `Lily58`, then reset the left.
+> **Don't try to turn off host Bluetooth with `CONFIG_BT_MAX_CONN=1` on the left.**
+> Tried 2026-10-07, and it killed the right half. While the left broadcasts for a
+> host, that broadcast holds a connection slot (Zephyr `adv.c`, `le_adv_start_add_conn`),
+> so the split link never gets one. ZMK can't switch host BLE off on a BLE split.
+> To use USB only, leave the keyboard unpaired on the host (`bluetoothctl remove <MAC>`).
+> Output only moves to BLE when a bonded host is connected.
 
 Pair the host in an **interactive** `bluetoothctl` session. A one-shot
 `bluetoothctl pair <MAC>` fails even when everything is healthy.
