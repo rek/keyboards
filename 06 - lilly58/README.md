@@ -46,9 +46,24 @@ To flash: double-tap RESET on the target nice!nano so the `NICENANO` drive appea
 
 A cloud-build fallback exists at repo root: `.github/workflows/lilly58.yml`.
 
-## Bluetooth
+## Wired split (TRRS), no Bluetooth
 
-Halves talk over BLE (no TRRS needed). Pairing controls are on the **raise** layer: `BT_SEL 0–4` to switch profiles, `BT_CLR` to clear a stuck pairing.
+Since 2026-10-07 Bluetooth is **off** (`CONFIG_ZMK_BLE=n`). The halves talk over a **TRRS** cable
+(4 contacts; a 3-contact TRS plug's sleeve bridges two jack contacts), and the left talks to the PC over USB.
+
+ZMK's wired split is full-duplex UART, so it needs **two** data wires. The Lily58 jack (J2) only routes one
+to the controller (pad 3, `DATA`). Pad 4 goes only to the `P1` pad, so each half needs a hand-soldered
+jumper from `P1` to a free nice!nano pin (the **same** pin on both halves).
+
+Before the first wired build, fill in the four pin values in
+[`zmk-config/config/lily58-wired-pins.h`](zmk-config/config/lily58-wired-pins.h) and delete its `#error` line.
+Until then every build (local and CI) fails on purpose. `lily58_left.overlay` / `lily58_right.overlay` handle
+the TX/RX crossover.
+
+**Never plug or unplug the TRRS cable while either half has power** (USB or battery). ZMK's docs warn it can
+permanently damage the controllers.
+
+The right half is powered through the cable from the left's VCC pin. Switch its battery off or remove it.
 
 ## Battery
 
@@ -68,7 +83,7 @@ readout over USB at all.
 
 ## What the extra PCB holes are (all optional for wireless)
 
-Near the controller: `RESET` (reset button), and the **I²C section** — `R1`/`R2` (SDA/SCL pull-up resistors), `P1`/`P2` (I²C breakout pads), `J2` (TRRS jack, `MJ-4PP-9`). These exist for the **wired QMK** build (halves talk over I²C through the TRRS cable) and the OLED. **For our wireless build none are needed** — only populate `R1`/`R2` if you add the I²C **OLED** screen (then also enable `CONFIG_ZMK_DISPLAY` in `lily58.conf`).
+Near the controller: `RESET` (reset button), and the **I²C section** — `R1`/`R2` (SDA/SCL pull-up resistors), `P1`/`P2` (I²C breakout pads), `J2` (TRRS jack, `MJ-4PP-9`). `J2` and `P1` are used by the wired ZMK build (see *Wired split* above). `R1`/`R2` are only needed for the I²C **OLED** screen (then also enable `CONFIG_ZMK_DISPLAY` in `lily58.conf`).
 
 ## To-do
 
