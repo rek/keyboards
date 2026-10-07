@@ -189,6 +189,15 @@ Rows `0x5`–`0x9` mean the override was dropped. **Do not flash.**
 
 ### D. Bluetooth pairing and battery
 
+> **Host Bluetooth is disabled** since 2026-10-07 (`CONFIG_BT_MAX_CONN=1` on the
+> left; see the comment in `lily58_left.conf`). Host Bluetooth can't be fully
+> turned off on a split, because the half-to-half link needs it too. The left
+> keeps one BLE slot for the right half, so no host can connect, and battery
+> levels no longer reach the PC. This section only applies if you remove that line.
+>
+> If the right half goes dead after boot, a host may have taken the slot before
+> the right half linked. Run `bluetoothctl devices` and `remove` any `Lily58`, then reset the left.
+
 Pair the host in an **interactive** `bluetoothctl` session. A one-shot
 `bluetoothctl pair <MAC>` fails even when everything is healthy.
 

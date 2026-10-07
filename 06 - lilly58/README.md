@@ -48,7 +48,7 @@ A cloud-build fallback exists at repo root: `.github/workflows/lilly58.yml`.
 
 ## Bluetooth
 
-Halves talk over BLE (no TRRS needed). Pairing controls are on the **raise** layer: `BT_SEL 0–4` to switch profiles, `BT_CLR` to clear a stuck pairing.
+Halves talk over BLE (no TRRS needed). **Host Bluetooth is off** (2026-10-07): the left half reaches the PC over USB only. `CONFIG_BT_MAX_CONN=1` in `lily58_left.conf` leaves its single BLE slot for the right half. To bring host Bluetooth back, delete that line, reflash the left, and pair as in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) §D. Pairing controls (`BT_SEL 0–4`, `BT_CLR`) stay on the **raise** layer.
 
 ## Battery
 
