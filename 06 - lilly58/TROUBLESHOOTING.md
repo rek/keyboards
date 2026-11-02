@@ -1,8 +1,10 @@
-# Lily58 Pro (wireless) — Troubleshooting & Fresh-Arch Setup
+# Lily58 Pro — Troubleshooting & Fresh-Arch Setup
 
 Symptom-first guide for the 06 build: a Lily58 Pro with one **nice!nano v2** per
 half, running **ZMK**. Written from a working setup on Arch Linux (Omarchy /
-Hyprland).
+Hyprland). Two firmware variants share the hardware: **06a** (Bluetooth,
+`zmk-config/06a-ble/`) and **06b** (TRRS wired, `zmk-config/06b-wired/`). Bluetooth
+sections apply to 06a only; [section F](#f-06b-trrs-wired-link) covers 06b.
 
 **Start with the script — it does the checking for you:**
 
@@ -49,8 +51,8 @@ ignore it.
 | | Cloud build (easiest) | Local build |
 |---|---|---|
 | Needs | Repo on GitHub with Actions enabled | About 2 GB disk and a few minutes of downloads |
-| Steps | Actions → **Build lilly58 (06)** → *Run workflow* → download artifact `lilly58-firmware` | `./doctor.sh setup`, then `./build-flash.sh left\|right` |
-| Gives you | `.uf2` for `lily58_left`, `lily58_right`, `settings_reset` | Same three images, and you can edit and rebuild locally |
+| Steps | Actions → **Build lilly58 (06)** → *Run workflow* → download artifact `lilly58-firmware` | `./doctor.sh setup`, then `./build-flash.sh 06a\|06b left\|right` |
+| Gives you | `.uf2` for each variant's `lily58_left` / `lily58_right` (artifact names start `06a-` / `06b-`), plus `06a-settings_reset` | Same images, and you can edit and rebuild locally |
 | Last verified | Green on 2026-08-15 | 2026-09-21: on a pristine Arch container, `doctor.sh setup --yes`, both builds and the pin-map check all passed (no hardware). Keyboard typing last confirmed 2026-07-06 |
 
 The cloud left image already includes ZMK Studio and the battery proxy (both are
@@ -75,11 +77,15 @@ cd "06 - lilly58/zmk-config"
 Then:
 
 1. **Label the halves L and R** before flashing anything.
-2. Build with `./build-flash.sh left --no-flash` (and `right`), then run
-   `./doctor.sh check` — it verifies the pin map inside each image before you flash.
-3. Follow *Clean pairing procedure* in [`BUILDING.md`](BUILDING.md), **one board
-   plugged in at a time**: reset image, wait 5 s, real image, for each half.
-4. Pair the host — see [Bluetooth](#d-bluetooth-pairing-and-battery).
+2. Build with `./build-flash.sh 06b left --no-flash` (and `right`; `06a` for
+   Bluetooth), then run `./doctor.sh check` — it verifies the pin map inside each
+   image before you flash.
+3. **06b:** the TRRS link needs the one-time hardware rework in
+   [`BUILDING.md`](BUILDING.md#06b-trrs-hardware-rework-one-time). Flash both
+   halves, plug in the cable while unpowered, then plug the left into USB.
+4. **06a:** follow *Clean pairing procedure* in [`BUILDING.md`](BUILDING.md), **one
+   board plugged in at a time** (reset image, wait 5 s, real image, for each half),
+   then pair the host — see [Bluetooth](#d-bluetooth-pairing-and-battery).
 
 <details><summary>What setup does by hand (if you'd rather not run it)</summary>
 
@@ -139,7 +145,7 @@ when it's showing as a `NICENANO` drive.
 | Studio build fails in nanopb, or on protobuf | `protobuf` / `grpcio-tools` missing from the venv | `~/dev/zmk-workspace/.venv/bin/pip install protobuf grpcio-tools`, then **re-run** — the first build after installing can fail once |
 | `west` or compiler not found | venv not on `PATH` / toolchain variables unset | Use `build-flash.sh`, which sets `ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb` and `GNUARMEMB_TOOLCHAIN_PATH=/usr` |
 | `build-flash.sh` can't find the workspace | Workspace isn't at `~/dev/zmk-workspace` | `export ZMK_WS=/your/path` (both `build-flash.sh` and `doctor.sh` honour it) |
-| A build that worked last month now fails | `west.yml` tracks ZMK `main`, which moves | Pin it. `doctor.sh setup` already pins new workspaces to the known-good ZMK `64daf698e073e37b6748ac54f4eb48d8666af0b9` (2026-06-20, Zephyr `v4.1.0+zmk-fixes`). For an older workspace: `git -C ~/dev/zmk-workspace/zmk fetch --depth=1 origin 64daf698e073e37b6748ac54f4eb48d8666af0b9 && git -C ~/dev/zmk-workspace/zmk checkout FETCH_HEAD && (cd ~/dev/zmk-workspace/zmk && ../.venv/bin/west update -n -o=--depth=1)`. The cloud build tracks `main` (`config/west.yml`); put the hash in `revision:` there to pin it too |
+| A build that worked last month now fails | `west.yml` tracks ZMK `main`, which moves | Pin it. `doctor.sh setup` already pins new workspaces to the known-good ZMK `64daf698e073e37b6748ac54f4eb48d8666af0b9` (2026-06-20, Zephyr `v4.1.0+zmk-fixes`). For an older workspace: `git -C ~/dev/zmk-workspace/zmk fetch --depth=1 origin 64daf698e073e37b6748ac54f4eb48d8666af0b9 && git -C ~/dev/zmk-workspace/zmk checkout FETCH_HEAD && (cd ~/dev/zmk-workspace/zmk && ../.venv/bin/west update -n -o=--depth=1)`. The cloud build tracks `main` (each variant's `config/west.yml`); put the hash in `revision:` there to pin it too |
 | **Build is green but the keyboard types nothing** | Pin-map override silently dropped — see below | Verify `zephyr.dts` before flashing |
 
 ### B. Flashing
@@ -166,7 +172,7 @@ inject it. If you build by hand, you must too.
 `./doctor.sh check` verifies this for every built image. By hand:
 ```sh
 grep -A6 'kscan0: kscan' ~/dev/zmk-workspace/zmk/build/<dir>/zephyr/zephyr.dts
-# <dir> = left-studio | right | left-studio-nobat
+# <dir> = 06b-left-studio | 06b-right | 06a-left-studio | 06a-right | 06a-left-studio-nobat
 ```
 
 | Half | rows (must be) | cols (must be) |
@@ -228,7 +234,7 @@ No passkey is configured — pairing is BLE "Just Works".
 | Symptom | Cause | Fix |
 |---|---|---|
 | **"Failed to connect" and the keyboard isn't plugged in** | This build serves Studio over the **USB cable only**, not Bluetooth. No cable means no serial port, even though typing over Bluetooth works | Plug the **left** half into the PC with a data cable. `ls /dev/ttyACM*` should now show a port |
-| Keyboard is plugged in, but there's no `/dev/ttyACM*` | It's the **right** half (it has no Studio), or the left was flashed with an image built without Studio | Plug in the left half. Or rebuild it with `./build-flash.sh left`, which always includes Studio, and reflash |
+| Keyboard is plugged in, but there's no `/dev/ttyACM*` | It's the **right** half (it has no Studio), or the left was flashed with an image built without Studio | Plug in the left half. Or rebuild it with `./build-flash.sh <variant> left`, which always includes Studio, and reflash |
 | Port exists but connecting fails or says busy | Another program has the port open: a second Studio tab, or ModemManager (can grab USB serial ports) | Close other Studio tabs. `sudo systemctl disable --now ModemManager`. `./doctor.sh check` warns if it's running |
 | No serial port, or permission denied | udev rule missing | `./doctor.sh setup`, then replug the left half. `/dev/ttyACM0` should be group `uucp` with an ACL entry |
 | Site can't connect | Studio needs Web Serial, which is Chromium-only | Use Chrome, Chromium or Edge at https://zmk.studio |
@@ -237,6 +243,20 @@ No passkey is configured — pairing is BLE "Just Works".
 | Edits vanished | Studio edits live in the keyboard's flash, not in `lily58.keymap`. `settings_reset` wipes them, and rebuilds use the file | Copy layouts you want to keep back into `lily58.keymap` |
 
 ---
+
+### F. 06b TRRS wired link
+
+Both halves must run 06b. Unplug and replug the TRRS cable only while both
+halves are unpowered.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Left types, right types nothing, rework never done | The reversed hole-set grounds J2's DATA line and leaves pad 4 unconnected | Do the rework in [`BUILDING.md`](BUILDING.md#06b-trrs-hardware-rework-one-time) |
+| Left types, right types nothing, rework done | A broken wire, W1 not fully cut, or the firmware pins don't match the holes | Run the meter table in the rework section. Then follow *06b: verifying the wired link* in `BUILDING.md`: `--log` images show whether the right sends and whether the left receives anything |
+| Right `--log` shows payloads, left `--log` shows nothing at all | No signal reaches the left's RX pin | The jumper is on a different pin than `lily58-wired-pins.h` says. With the cable unplugged, a transmit hole must idle at 3.3V |
+| Strange voltages while measuring (e.g. a pin "at 1.5V", or 0V where you expect 3V) | Hole 3 / the PCB "GND" net is really the nice!nano's 3.3V rail | Use hole 2 or J2's end leg next to the lone leg as the 0V reference |
+| One half flashed with the other half's image | Both halves were in bootloader mode and the wrong drive got the file | `build-flash.sh` now picks the drive by USB serial. Re-run it for each half |
+| Right half dead even on its own USB | It's the peripheral; it never types over USB by itself | Test it through the left, with the cable in |
 
 ## 4. When nothing else works: clean reset
 
@@ -271,7 +291,8 @@ CMake 4.4.3, protobuf 6.33.6, grpcio-tools 1.81.1, BlueZ 5.87.
 
 ## 6. Don't
 
-- Don't use the `zmk-usb-logging` build. It hangs at boot.
+- Don't combine `zmk-usb-logging` with Studio on the left. It hung at boot. `build-flash.sh --log` turns Studio off, and that works.
+- Don't plug or unplug the TRRS cable while either half has power.
 - Don't use the `CONFIG_ZMK_SPLIT=n` standalone-right test. It gives false negatives.
 - Don't test with both halves juggled on one cable. Finish one board before touching the other.
 - Don't rely on reflashing to clear a stuck Bluetooth output or a bad bond. It doesn't.

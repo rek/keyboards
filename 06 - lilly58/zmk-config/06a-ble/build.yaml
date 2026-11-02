@@ -1,3 +1,4 @@
+# 06a (Bluetooth split, battery powered).
 # Board/shield combos to build. Each produces a .uf2 you drag onto the nice!nano.
 # Board id is HWMv2 (ZMK main): nice_nano@2.0.0/nrf52840/zmk — NOT nice_nano_v2.
 include:

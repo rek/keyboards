@@ -1,0 +1,12 @@
+# 06b (TRRS wired split). Board/shield combos to build. Each produces a .uf2 you
+# drag onto the nice!nano. Board id is HWMv2 (ZMK main):
+# nice_nano@2.0.0/nrf52840/zmk — NOT nice_nano_v2.
+# No settings_reset image here: with Bluetooth off there are no bonds to wipe
+# (06a-ble/build.yaml still builds it).
+include:
+  - board: "nice_nano@2.0.0/nrf52840/zmk"
+    shield: lily58_left
+    # Studio RPC rides a USB CDC-ACM endpoint on the central half only.
+    snippet: studio-rpc-usb-uart
+  - board: "nice_nano@2.0.0/nrf52840/zmk"
+    shield: lily58_right

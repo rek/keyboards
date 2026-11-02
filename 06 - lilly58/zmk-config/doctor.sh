@@ -21,7 +21,8 @@
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_SRC="$HERE/config"
+VARIANTS=(06a 06b)                              # 06a = 06a-ble/, 06b = 06b-wired/
+variant_dir() { case $1 in 06a) echo "$HERE/06a-ble/config" ;; 06b) echo "$HERE/06b-wired/config" ;; esac; }
 WS="${ZMK_WS:-$HOME/dev/zmk-workspace}"
 USB_SYSFS="${USB_SYSFS:-/sys/bus/usb/devices}"    # overridable so tests can fake it
 VID=1d50 PID=615e
@@ -111,9 +112,10 @@ check_workspace() {
   fi
 }
 
-# Verify one built image's key-matrix pins. $1=build dir name, $2=left|right
+# Verify one built image's key-matrix pins. $1=build dir name (<variant>-<x>), $2=left|right
 check_image_pins() {
-  local dir=$1 side=$2 b="$WS/zmk/build/$1" dts uf2 rows cols want_cols
+  local dir=$1 side=$2 b="$WS/zmk/build/$1" dts uf2 rows cols want_cols variant=${1%%-*} config_src
+  config_src=$(variant_dir "$variant")
   dts="$b/zephyr/zephyr.dts"; uf2="$b/zephyr/zmk.uf2"
   [[ -f $dts && -f $uf2 ]] || return 0
   rows=$(grep -m1 'row-gpios' "$dts" | grep -oE '&pro_micro 0x[0-9a-f]+' | awk '{print $2}' | tr '\n' ' ' | sed 's/ $//')
@@ -125,24 +127,26 @@ check_image_pins() {
     bad "build/$dir: WRONG pin map — rows [$rows] cols [$cols]"
     info "expected rows [$ROWS] cols [$want_cols]. Stock pins (rows 0x5-0x9) mean the keymap"
     info "override was dropped: the board would enumerate and type nothing. DO NOT FLASH."
-    fix "rebuild with $BF $side --no-flash (it injects the required define)"
+    fix "rebuild with $BF $variant $side --no-flash (it injects the required define)"
   fi
   local other=right newer; [[ $side == right ]] && other=left    # lily58_<other>.conf isn't part of this image
-  newer=$(find "$CONFIG_SRC" -type f ! -name "lily58_${other}.conf" -newer "$uf2" -print -quit 2>/dev/null)
+  newer=$(find "$config_src" -type f ! -name "lily58_${other}.conf" -newer "$uf2" -print -quit 2>/dev/null)
   if [[ -n $newer ]]; then
-    warn "build/$dir is older than config/$(basename "$newer") — it may be missing your latest edits"
-    fix "$BF $side --no-flash    (then flash it)"
+    warn "build/$dir is older than $variant config/$(basename "$newer") — it may be missing your latest edits"
+    fix "$BF $variant $side --no-flash    (then flash it)"
   fi
 }
 
 check_images() {
   section "Built firmware images"
-  local any=0 d
-  for d in left-studio left-studio-nobat left; do
-    [[ -f $WS/zmk/build/$d/zephyr/zmk.uf2 ]] && { any=1; check_image_pins "$d" left; }
+  local any=0 v d
+  for v in "${VARIANTS[@]}"; do
+    for d in left-studio left-studio-nobat; do
+      [[ -f $WS/zmk/build/$v-$d/zephyr/zmk.uf2 ]] && { any=1; check_image_pins "$v-$d" left; }
+    done
+    [[ -f $WS/zmk/build/$v-right/zephyr/zmk.uf2 ]] && { any=1; check_image_pins "$v-right" right; }
   done
-  [[ -f $WS/zmk/build/right/zephyr/zmk.uf2 ]] && { any=1; check_image_pins right right; }
-  ((any)) || info "no left/right image built yet — run: $BF left --no-flash"
+  ((any)) || info "no left/right image built yet — run: $BF 06b left --no-flash   (or 06a for Bluetooth)"
   if [[ -f $WS/zmk/build/reset/zephyr/zmk.uf2 ]]; then
     ok "settings_reset image present"
   else
@@ -170,7 +174,7 @@ check_studio_access() {
     info "plug the LEFT half in with a data cable, then a serial port (/dev/ttyACM*) appears"
   elif ((ports == 0)); then
     warn "Lily58 is on USB but has no serial port, so ZMK Studio can't connect"
-    fix "it's probably the RIGHT half (no Studio there) — plug in the LEFT — or the left image was built without Studio (build-flash.sh left always includes it)"
+    fix "it's probably the RIGHT half (no Studio there) — plug in the LEFT — or the left image was built without Studio (build-flash.sh <variant> left always includes it)"
   fi
   if systemctl is-active --quiet ModemManager 2>/dev/null; then
     warn "ModemManager is running; it can grab USB serial ports and make Studio fail to connect"
@@ -276,7 +280,7 @@ check_ble_one() {
   case ${#bats[@]} in
     0) info "no battery service readable" ;;
     1) warn "only one battery service (left ${bats[0]}%). The right half isn't proxied — left image built with --no-batt?"
-       fix "$BF left   (canonical image has battery proxy on)" ;;
+       fix "$BF 06a left   (canonical image has battery proxy on)" ;;
     *) if ((bats[0] <= 15)); then warn "left battery low: ${bats[0]}%"; else ok "left battery ${bats[0]}%"; fi
        if ((bats[1] == 0)); then
          warn "right battery reads 0% — right half asleep/off, or its link came up <60 s ago (it reports every 60 s)"
@@ -418,7 +422,7 @@ main_setup() {
   echo "  1. Label the two halves L and R."
   echo "  2. One board at a time — double-tap RESET (red pulse, NICENANO drive appears):"
   echo "       flash build/reset/zephyr/zmk.uf2, wait 5 s, double-tap again, then run"
-  echo "       $BF left      (and later: ... right)"
+  echo "       $BF 06b left      (and later: ... right; 06a for Bluetooth)"
   echo "  3. Pair the host, then run: $SELF check"
   ((rc == 0)) || printf '\n%s%s%s\n' "$R" "setup finished with problems (see above)." "$N"
   return "$rc"

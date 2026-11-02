@@ -5,6 +5,10 @@ name: Build lilly58 (06)
 # reliably build from a subdirectory (upstream PR #2975 unmerged) and its unquoted
 # paths break on the space in "06 - lilly58". Here west init/update/build all run
 # with working-directory set to the config subfolder, and every path is quoted.
+#
+# Two firmware variants share one keyboard (see "06 - lilly58/README.md"):
+# 06a-ble/ (Bluetooth) and 06b-wired/ (TRRS). Each has its own build.yaml; the
+# matrix job merges them and tags every entry with its variant folder.
 
 on:
   push:
@@ -28,7 +32,9 @@ jobs:
       - uses: actions/checkout@v4
       - id: fetch
         run: |
-          m=$(yq -oj -I0 '.' "$CONFIG_DIR/build.yaml")
+          m=$(for v in 06a-ble 06b-wired; do
+                yq -oj -I0 ".include[] | .variant = \"$v\"" "$CONFIG_DIR/$v/build.yaml"
+              done | jq -sc '{include: .}')
           echo "matrix=$m" >> "$GITHUB_OUTPUT"
 
   build:
@@ -46,12 +52,13 @@ jobs:
         env:
           board: ${{ matrix.board }}
           shield: ${{ matrix.shield }}
+          variant: ${{ matrix.variant }}
         # bash, not sh: the lines below use ${var//x/y} and ${var:+...}, which
         # dash (the runner's /bin/sh) rejects with "Bad substitution".
         shell: bash
         run: |
           echo "build_dir=$(mktemp -d)" >> "$GITHUB_ENV"
-          echo "artifact_name=${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
+          echo "artifact_name=${variant%%-*}-${shield:+${shield}-}${board//\//_}-zmk" >> "$GITHUB_ENV"
           echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"}" >> "$GITHUB_ENV"
           # lily58.keymap gates its kscan remaps on CONFIG_SHIELD_LILY58_{LEFT,RIGHT},
           # but Zephyr preprocesses devicetree BEFORE Kconfig, so those macros are
@@ -68,7 +75,7 @@ jobs:
       - name: Stage config to a space-free path
         run: |
           mkdir -p /zmkws
-          cp -r "$CONFIG_DIR/." /zmkws/
+          cp -r "$CONFIG_DIR/${{ matrix.variant }}/." /zmkws/
 
       - name: West init
         run: cd /zmkws && west init -l config

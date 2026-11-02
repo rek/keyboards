@@ -1,5 +1,8 @@
 # Showing the battery on the host
 
+**06a (Bluetooth) only.** 06b runs with Bluetooth off, so the host gets no
+battery readout at all.
+
 How to get both halves' battery percentage into a desktop status bar, and why
 reading it is more awkward than it looks. Hardware side of the battery (wiring,
 charging, capacity) is in [`README.md`](README.md#battery); this file is purely

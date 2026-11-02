@@ -1,5 +1,12 @@
 # 06 Lily58 Pro — Handoff / Bring-up State
 
+> **2026-11-01: this file is history.** Paths below predate the 06a/06b split:
+> `zmk-config/config/` is now `zmk-config/06a-ble/config/` (Bluetooth) and
+> `zmk-config/06b-wired/config/` (TRRS), and build dirs are
+> `build/<variant>-<dir>`. Current procedure: `BUILDING.md`. The 06b TRRS
+> bring-up (reversed hole-set grounds J2's DATA; W1 cut + two jumpers) is
+> written up in `README.md` and `BUILDING.md`.
+
 > Purpose: hand this wireless Lily58 Pro build to a fresh agent. Read this top-to-bottom
 > before touching anything. Everything hard has already been figured out; what remains is
 > **careful, un-rushed assembly + pairing** (which kept going wrong when tired).
