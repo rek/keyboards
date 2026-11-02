@@ -20,6 +20,8 @@ Diode to use: **1N4148**
 
 ## Firmware notes:
 
+**Vial (live remapping, no reflash):** see [`vial/README.md`](vial/README.md). The notes below are the older plain-QMK flow.
+
 Then edit the keymap here:
 
 ```

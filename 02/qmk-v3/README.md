@@ -48,7 +48,7 @@ git clone --recurse-submodules https://github.com/vial-kb/vial-qmk.git \
     ~/dev/forks/vial-qmk
 
 # 3. Expose this folder to the tree as a keyboard (symlink — edits stay in this repo)
-ln -s ~/dev/keyboards/02/qmk-v2 ~/dev/forks/vial-qmk/keyboards/handwired/aximi
+ln -s ~/dev/keyboards/02/qmk-v3 ~/dev/forks/vial-qmk/keyboards/handwired/aximi
 ```
 
 ### Required patch for avr-gcc 15+
@@ -63,28 +63,69 @@ top includes of that file (in the vial-qmk tree):
 #endif
 ```
 
+### Required workarounds for avr-gcc 16.1.0 (Arch, current as of Sep 2026)
+
+Arch's `avr-gcc` package moved to a vanilla-FSF GCC 16 build whose baked-in
+search paths (`/usr/avr/{include,sys-include}`) don't match where the
+`avr-libc` package actually installs (`/usr/lib/avr/{include,lib}`). Three
+symptoms, all from this one mismatch + GCC 16 being generally stricter/bigger:
+
+1. **`fatal error: stdint.h: No such file or directory`** — avr-gcc's own
+   `stdint.h` does an `#include_next` that can't find avr-libc's headers.
+   Fix: `CPATH=/usr/lib/avr/include` as an env var on the compile/flash command.
+2. **`cannot find crtatmega32u4.o` / `-lm` / `-lc` / `-latmega32u4`** at link —
+   same path mismatch, this time for the avr5-multilib startfiles/libs. Fix:
+   pass `-B/usr/lib/avr/lib/avr5 -L/usr/lib/avr/lib/avr5` (an env `LIBRARY_PATH`
+   does **not** reach the startfile search — it has to be `-B` on the command line).
+3. **`-Werror=strict-prototypes` / `-Werror=unused-but-set-variable`** in
+   `avr/power.h` and the vendored LUFA USB stack — old headers/code, GCC 16's
+   default warnings are stricter. Fix: `-Wno-error` to keep them as warnings.
+4. **Firmware ~500 bytes over the 28672-byte budget** even with no keymap
+   changes — GCC 16's AVR codegen is measurably larger than the older
+   avr-gcc this budget was tuned against (confirmed: neither
+   `VIAL_TAP_DANCE_ENTRIES` nor `EXTRAKEY_ENABLE` moved the size at all on
+   this GCC — don't waste time on those levers first). Fix: AVR call/jump
+   relaxation, `-mrelax` (compile) + `-Wl,--relax` (link) — recovered ~500
+   bytes with no feature loss.
+
+All four fold into the one compile/flash invocation below. If a future Arch
+update reconciles the avr-gcc/avr-libc paths or ships a smaller-codegen
+avr-gcc, these may no longer be needed — try a plain `qmk compile` first.
+
 ## Compile
 
 ```sh
 cd ~/dev/forks/vial-qmk
-QMK_HOME=$PWD qmk compile -kb handwired/aximi -km vial
+CPATH=/usr/lib/avr/include QMK_HOME=$PWD qmk compile -kb handwired/aximi -km vial \
+  -e 'EXTRAFLAGS=-Wno-error -mrelax -B/usr/lib/avr/lib/avr5 -L/usr/lib/avr/lib/avr5' \
+  -e 'EXTRALDFLAGS=-Wl,--relax'
 ```
 
-> **Flash budget is tight** (atmega32u4 caterina = 28672 bytes). To fit, the
-> keymap `rules.mk` disables `MOUSEKEY`, `GRAVE_ESC`, `SPACE_CADET`, `MAGIC`.
-> Current size ≈ 28560/28672 (~112 bytes free). If a future change overflows,
-> the next lever is `EXTRAKEY_ENABLE = no` (no media keys are used).
+> **Flash budget is tight** (atmega32u4 caterina = 28672 bytes). The keymap
+> `rules.mk` already disables `MOUSEKEY`, `GRAVE_ESC`, `SPACE_CADET`, `MAGIC`,
+> and the compile above adds `-mrelax`/`--relax`. Current size on avr-gcc
+> 16.1.0 ≈ 28636/28672 (~36 bytes free) — very little headroom left. If a
+> future change overflows again, `EXTRAKEY_ENABLE = no` and cutting
+> `VIAL_TAP_DANCE_ENTRIES` are already-tried dead ends on this compiler;
+> look at `VIAL_COMBO_ENTRIES`/`VIAL_KEY_OVERRIDE_ENTRIES` or trimming the
+> keymap itself instead.
 
 ## Flash
 
 Each half is flashed separately and gets its handedness written in the **same**
 avrdude session (single reset — works around caterina dropping the bootloader
-after the flash pass):
+after the flash pass). `qmk flash` recompiles first, so it needs the same
+env vars and flags as `qmk compile` above:
 
 ```sh
 cd ~/dev/forks/vial-qmk
-QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-left   # left half
-QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-right  # right half
+CPATH=/usr/lib/avr/include QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-left \
+  -e 'EXTRAFLAGS=-Wno-error -mrelax -B/usr/lib/avr/lib/avr5 -L/usr/lib/avr/lib/avr5' \
+  -e 'EXTRALDFLAGS=-Wl,--relax'   # left half
+
+CPATH=/usr/lib/avr/include QMK_HOME=$PWD qmk flash -kb handwired/aximi -km vial -bl avrdude-split-right \
+  -e 'EXTRAFLAGS=-Wno-error -mrelax -B/usr/lib/avr/lib/avr5 -L/usr/lib/avr/lib/avr5' \
+  -e 'EXTRALDFLAGS=-Wl,--relax'   # right half
 ```
 
 When it prints **“Waiting for USB serial port — reset your controller now”**,
